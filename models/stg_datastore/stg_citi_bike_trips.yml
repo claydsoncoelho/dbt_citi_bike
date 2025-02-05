@@ -1,0 +1,153 @@
+models:
+  - name: stg_citi_bike_trips_01
+    description: 'This table extracts the JSON data from "weather_nyc" and flattens it into a tabular format.'
+    columns:
+      - name: bike_id
+        description: '{{ doc("col_bike_id") }}'
+        tests:
+          - not_null
+
+      - name: start_time
+        description: '{{ doc("col_start_time") }}'
+        tests:
+          - not_null
+
+      - name: stop_time
+        description: '{{ doc("col_stop_time") }}'
+
+      - name: trip_duration
+        description: '{{ doc("col_trip_duration") }}'
+        tests:
+          - not_null
+
+      - name: start_station_id
+        description: '{{ doc("col_start_station_id") }}'
+
+      - name: start_station_name
+        description: '{{ doc("col_start_station_name") }}'
+
+      - name: start_station_latitude
+        description: '{{ doc("col_start_station_latitude") }}'
+
+      - name: start_station_longitude
+        description: '{{ doc("col_start_station_longitude") }}'
+
+      - name: start_location
+        description: '{{ doc("col_start_location") }}'
+
+      - name: start_location_geography
+        description: '{{ doc("col_start_location_geography") }}'
+
+      - name: end_station_id
+        description: '{{ doc("col_end_station_id") }}'
+
+      - name: end_station_name
+        description: '{{ doc("col_end_station_name") }}'
+
+      - name: end_station_latitude
+        description: '{{ doc("col_end_station_latitude") }}'
+
+      - name: end_station_longitude
+        description: '{{ doc("col_end_station_longitude") }}'
+
+      - name: end_location
+        description: '{{ doc("col_end_location") }}'
+
+      - name: end_location_geography
+        description: '{{ doc("col_end_location_geography") }}'
+
+      - name: user_type
+        description: '{{ doc("col_user_type") }}'
+
+      - name: birth_year
+        description: '{{ doc("col_birth_year") }}'
+
+      - name: gender
+        description: '{{ doc("col_gender") }}'
+        tests:
+          - accepted_values:
+              values: ['0','1','2']
+
+      - name: metadata_filename
+        description: '{{ doc("col_metadata_filename") }}'
+
+      - name: metadata_file_row_number
+        description: '{{ doc("col_metadata_file_row_number") }}'
+
+      - name: metadata_file_last_modified
+        description: '{{ doc("col_metadata_file_last_modified") }}'
+
+      - name: metadata_processed_flag
+        description: '{{ doc("col_metadata_processed_flag") }}'
+
+  - name: stg_citi_bike_trips_02
+    description: 'This table extracts the JSON data from "weather_nyc" and flattens it into a tabular format.'
+    columns:
+      - name: bike_id
+        description: '{{ doc("col_bike_id") }}'
+
+      - name: start_time
+        description: '{{ doc("col_start_time") }}'
+
+      - name: stop_time
+        description: '{{ doc("col_stop_time") }}'
+
+      - name: trip_duration
+        description: '{{ doc("col_trip_duration") }}'
+
+      - name: start_station_id
+        description: '{{ doc("col_start_station_id") }}'
+
+      - name: start_station_name
+        description: '{{ doc("col_start_station_name") }}'
+
+      - name: start_station_latitude
+        description: '{{ doc("col_start_station_latitude") }}'
+
+      - name: start_station_longitude
+        description: '{{ doc("col_start_station_longitude") }}'
+
+      - name: start_location
+        description: '{{ doc("col_start_location") }}'
+
+      - name: start_location_geography
+        description: '{{ doc("col_start_location_geography") }}'
+
+      - name: end_station_id
+        description: '{{ doc("col_end_station_id") }}'
+
+      - name: end_station_name
+        description: '{{ doc("col_end_station_name") }}'
+
+      - name: end_station_latitude
+        description: '{{ doc("col_end_station_latitude") }}'
+
+      - name: end_station_longitude
+        description: '{{ doc("col_end_station_longitude") }}'
+
+      - name: end_location
+        description: '{{ doc("col_end_location") }}'
+
+      - name: end_location_geography
+        description: '{{ doc("col_end_location_geography") }}'
+
+      - name: user_type
+        description: '{{ doc("col_user_type") }}'
+
+      - name: birth_year
+        description: '{{ doc("col_birth_year") }}'
+
+      - name: gender
+        description: '{{ doc("col_gender") }}'
+
+      - name: metadata_filename
+        description: '{{ doc("col_metadata_filename") }}'
+
+      - name: metadata_file_row_number
+        description: '{{ doc("col_metadata_file_row_number") }}'
+
+      - name: metadata_file_last_modified
+        description: '{{ doc("col_metadata_file_last_modified") }}'
+
+      - name: metadata_processed_flag
+        description: '{{ doc("col_metadata_processed_flag") }}'
