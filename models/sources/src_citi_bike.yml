@@ -1,0 +1,9 @@
+version: 2
+
+sources:
+  - name: citi_bike
+    database: RAW
+    schema: citi_bike
+    tables:
+      - name: trips
+      - name: weather_nyc
