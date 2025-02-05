@@ -104,7 +104,11 @@ with
             metadata_file_last_modified
         from location
         {% if is_incremental() %}
-            where metadata_file_last_modified > (select max(metadata_file_last_modified) from {{ this }})
+        where metadata_file_last_modified >= 
+            COALESCE(
+                (select max(metadata_file_last_modified) from {{ this }}),
+                '1900-01-01'::timestamp
+            )
         {% endif %}
 
     )
