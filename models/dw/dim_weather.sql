@@ -1,4 +1,12 @@
--- depends_on: {{ ref('stg_dim_weather') }}
+
+{{ config(
+    materialized='table',
+    cluster_by=[
+        'time_readable',
+        'city_latitude',
+        'city_longitude'
+    ]
+) }}  
 
 {{ create_scd_type_2(
     source_table = 'stg_dim_weather'

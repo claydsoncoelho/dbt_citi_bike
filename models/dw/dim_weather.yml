@@ -1,0 +1,67 @@
+models:
+  - name: dim_weather
+    description: 'This table extracts weather data for New York City and includes various weather metrics and geolocation information.'
+    columns:
+      - name: dim_weather_wid
+        description: '{{ doc("col_dim_weather_wid") }}'
+
+      - name: dim_weather_sid
+        description: '{{ doc("col_dim_weather_sid") }}'
+
+      - name: time_readable
+        description: '{{ doc("col_time_readable") }}'
+
+      - name: country
+        description: '{{ doc("col_country") }}'
+
+      - name: city_name
+        description: '{{ doc("col_city_name") }}'
+
+      - name: weather_main
+        description: '{{ doc("col_weather_main") }}'
+
+      - name: weather_detail
+        description: '{{ doc("col_weather_detail") }}'
+
+      - name: temperature_celsius
+        description: '{{ doc("col_temperature_celsius") }}'
+
+      - name: humidity
+        description: '{{ doc("col_humidity") }}'
+
+      - name: wind_speed
+        description: '{{ doc("col_wind_speed") }}'
+
+      - name: city_latitude
+        description: '{{ doc("col_city_latitude") }}'
+
+      - name: city_longitude
+        description: '{{ doc("col_city_longitude") }}'
+
+      - name: city_location
+        description: '{{ doc("col_city_location") }}'
+
+      - name: temperature_kelvin
+        description: '{{ doc("col_temperature_kelvin") }}'
+
+      - name: pressure
+        description: '{{ doc("col_pressure") }}'
+
+      - name: wind_deg
+        description: '{{ doc("col_wind_deg") }}'
+
+      - name: city_id
+        description: '{{ doc("col_city_id") }}'
+
+      - name: city_findname
+        description: '{{ doc("col_city_findname") }}'
+
+      - name: valid_from
+        description: '{{ doc("col_valid_from") }}'
+
+      - name: valid_to
+        description: '{{ doc("col_valid_to") }}'
+
+      - name: current_row
+        description: '{{ doc("col_current_row") }}'
+
