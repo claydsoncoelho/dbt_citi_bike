@@ -41,6 +41,9 @@ with
             metadata_file_row_number AS metadata_file_row_number,
             metadata_file_last_modified AS metadata_file_last_modified
         from source 
+        {% if incremental %}
+            where source.time_readable >= {{ this }}.time_readable
+        {% endif %}
 
     ),
 
@@ -103,15 +106,15 @@ with
             metadata_file_row_number,
             metadata_file_last_modified
         from location
-        {% if is_incremental() %}
-        where metadata_file_last_modified >= 
-            COALESCE(
-                (select max(metadata_file_last_modified) from {{ this }}),
-                '1900-01-01'::timestamp
-            )
-        {% endif %}
+
+    ),
+
+    dedup as (
+
+        {{ dbt_utils.deduplicate('location_geography', 'time_readable', 'metadata_filename') }}
 
     )
 
+
 select *
-from location_geography
+from dedup

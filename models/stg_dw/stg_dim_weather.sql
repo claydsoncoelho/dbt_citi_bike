@@ -5,12 +5,11 @@ with
     stg_dim as (
 
         select
-            dbt_scd_id,
             time_readable,
             country,
             city_name,
             weather_main,
-            weather_description as weather_detail,
+            UPPER(SUBSTRING(weather_description, 1, 1)) || SUBSTRING(weather_description, 2) as weather_detail,
             temperature - 273.15 as temperature_celsius,
             humidity,
             wind_speed,
@@ -24,8 +23,6 @@ with
             city_id,
             city_findname,
             dbt_updated_at as transaction_datetime,
-            dbt_valid_from,
-            dbt_valid_to
         from source
 
     )
