@@ -40,8 +40,6 @@ with
             end_location
 
         from source
-        -- where weather_wid is not null
-        -- and date_part(year, start_time) = {{env_var('DBT_PROCESSING_YEAR')}}
 
     ),
 

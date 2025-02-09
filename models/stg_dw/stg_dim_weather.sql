@@ -1,3 +1,7 @@
+{{ config(
+    materialized='ephemeral'
+) }}
+
 with
 
     source as (select * from {{ ref("snap_stg_citi_bike_weather_nyc") }}),
