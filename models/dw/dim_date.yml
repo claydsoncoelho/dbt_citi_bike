@@ -1,0 +1,134 @@
+version: 2
+
+models:
+  - name: dim_date
+    description: "Dimension table containing detailed date attributes for time-based analysis."
+    columns:
+      - name: datekey
+        description: "Unique identifier for each date in yyyymmdd format. Example: '20150101'."
+        
+      - name: date
+        description: "The actual date value in the format yyyy-mm-dd. Example: '2015-01-01'."
+        
+      - name: fulldate
+        description: "Full date representation including time. Example: '2015-01-01 00:00:00.000'."
+        
+      - name: dayofmonth
+        description: "Day of the month (1-31). Example: '1'."
+        
+      - name: daysuffix
+        description: "Suffix used with the day of the month (e.g., 'st', 'nd', 'rd', 'th'). Example: '1st'."
+        
+      - name: dayname
+        description: "Full name of the day. Example: 'Thursday'."
+        
+      - name: dayofweek
+        description: "Numeric representation of the day of the week (1 = Sunday, 7 = Saturday). Example: '4' for Thursday."
+        
+      - name: dayofweekinmonth
+        description: "The ordinal position of the day within the month (e.g., 1st Monday, 2nd Tuesday). Example: '1'."
+        
+      - name: dayofweekinyear
+        description: "The position of the day within the year (e.g., 'Day 1 of the year'). Example: '1'."
+        
+      - name: dayofquarter
+        description: "The day of the quarter (1 to 90 or 91 depending on the quarter). Example: '1'."
+        
+      - name: dayofyear
+        description: "The day of the year (1 to 365 or 366 in leap years). Example: '1'."
+        
+      - name: weekofmonth
+        description: "The week number within the month (e.g., Week 1, Week 2). Example: '1'."
+        
+      - name: weekofquarter
+        description: "The week number within the quarter (e.g., Week 1, Week 2). Example: '1'."
+        
+      - name: weekofyear
+        description: "The week number within the year (e.g., Week 1, Week 2). Example: '1'."
+        
+      - name: month
+        description: "Numeric month (1 = January, 12 = December). Example: '1'."
+        
+      - name: monthname
+        description: "Full name of the month. Example: 'January'."
+        
+      - name: monthofquarter
+        description: "The ordinal position of the month within the quarter (1 = first month of the quarter). Example: '1'."
+        
+      - name: quarter
+        description: "Numeric quarter of the year (1 = Q1, 2 = Q2, 3 = Q3, 4 = Q4). Example: '1'."
+        
+      - name: quartername
+        description: "Full name of the quarter (e.g., 'Q1', 'Q2'). Example: 'First'."
+        
+      - name: monthofreportingquarter
+        description: "The month number within the reporting quarter. Example: '3'."
+        
+      - name: reportingquarter
+        description: "Reporting quarter (e.g., 'Q1', 'Q2'). Example: 'Q3'."
+        
+      - name: reportingquartername
+        description: "Full name of the reporting quarter (e.g., 'First quarter', 'Second quarter'). Example: '3rd quarter'."
+        
+      - name: reportingquarterlabel
+        description: "Label for the reporting quarter (e.g., '2025 Q1'). Example: '3. Q3 2014-2015'."
+        
+      - name: reportingperiod
+        description: "A period of time in the reporting cycle, typically represented as a string (e.g., '2025 Q1'). Example: '2014-2015'."
+        
+      - name: reportingperiodbyyear
+        description: "The reporting period for the year in the format yyyy-qx (e.g., '2025-Q1'). Example: '2014-2015 Q3'."
+        
+      - name: reportingperiodyear
+        description: "The year of the reporting period. Example: '2015'."
+        
+      - name: year
+        description: "The four-digit year. Example: '2015'."
+        
+      - name: yearname
+        description: "The name of the year. Example: 'CY 2015'."
+        
+      - name: monthyear
+        description: "Combined month and year in the format yyyy-mm. Example: '2015-01'."
+        
+      - name: mmyyyy
+        description: "Combined month and year in the format mm-yyyy. Example: '01-2015'."
+        
+      - name: yyyymm
+        description: "Combined year and month in the format yyyymm. Example: '201501'."
+        
+      - name: firstdayofmonth
+        description: "The first day of the month. Example: '2015-01-01'."
+        
+      - name: lastdayofmonth
+        description: "The last day of the month. Example: '2015-01-31'."
+        
+      - name: firstdayofquarter
+        description: "The first day of the quarter. Example: '2015-01-01'."
+        
+      - name: lastdayofquarter
+        description: "The last day of the quarter. Example: '2015-03-31'."
+        
+      - name: firstdayofyear
+        description: "The first day of the year. Example: '2015-01-01'."
+        
+      - name: lastdayofyear
+        description: "The last day of the year. Example: '2015-12-31'."
+        
+      - name: isholiday
+        description: "Indicates if the date is a holiday (boolean: true/false). Example: '1'."
+        
+      - name: isweekday
+        description: "Indicates if the date is a weekday (boolean: true/false). Example: '1'."
+        
+      - name: holiday
+        description: "Name or description of the holiday if the date is a holiday. Example: '1/1/2015'."
+        
+      - name: displayfulldate
+        description: "A formatted string of the full date. Example: 'January 1, 2015'."
+        
+      - name: firstdayofreportingyear
+        description: "The first day of the reporting year. Example: '2014-07-01'."
+        
+      - name: lastdayofreportingyear
+        description: "The last day of the reporting year. Example: '2015-06-30'."
