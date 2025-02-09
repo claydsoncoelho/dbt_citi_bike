@@ -6,6 +6,10 @@ name: 'citi_bike'
 version: '1.0.0'
 config-version: 2
 
+vars:
+  min_date: "1900-01-01 00:00:00"
+  max_date: "9999-12-31 00:00:00"
+
 # This setting configures which "profile" dbt uses for this project.
 profile: 'default'
 
@@ -43,11 +47,15 @@ models:
     stg_dw:
       +database: STG_DW
       +materialized: view
+    dw:
+      +database: DW
+      +materialized: view
 
 snapshots:
   citi_bike:
     +target_database: DATASTORE
     +dbt_valid_to_current: "to_date('9999-12-31')"
+    
 
 seeds:
   citi_bike:

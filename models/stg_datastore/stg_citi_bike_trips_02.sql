@@ -1,3 +1,7 @@
+{{ config(
+    materialized='ephemeral'
+) }}
+
 with
 
     source as (select * from {{ ref("stg_citi_bike_trips_01") }}),
