@@ -36,22 +36,8 @@ with
 
         where dbt_valid_to = to_date('9999-12-31')
         {% if is_incremental() %}
-            and (
-                month_start_trip = (
-                    select min(month_start_trip)
-                    from {{ this }}
-                    where not(metadata_processed_flag)
-                )
-                or 
-                year_start_trip = (
-                    select min(date_part(year, start_time)) as year_start_trip
-                    from source
-                    where date_part(year, start_time) > 
-                    (
-                        select max(year_start_trip)
-                        from {{ this }}
-                    )
-                )
+            and start_time >= (
+                    select max(start_time) as start_time from {{ this }}
             )
         {% endif %}
 

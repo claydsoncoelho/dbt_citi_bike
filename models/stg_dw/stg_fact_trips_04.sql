@@ -15,12 +15,12 @@ with
             period_of_day,
             trip_distance_meters,
             case
-                when trip_distance_meters between 0 and 1000 then '0-1000'
-                when trip_distance_meters between 1001 and 2000 then '1001-2000'
-                when trip_distance_meters between 2001 and 3000 then '2001-3000'
-                when trip_distance_meters between 3001 and 4000 then '3001-4000'
-                when trip_distance_meters between 4001 and 5000 then '4001-5000'
-                else '5000+'
+                when trip_distance_meters between 0 and 1000 then '0-1'
+                when trip_distance_meters between 1001 and 2000 then '1-2'
+                when trip_distance_meters between 2001 and 3000 then '2-3'
+                when trip_distance_meters between 3001 and 4000 then '3-4'
+                when trip_distance_meters between 4001 and 5000 then '4-5'
+                else '5+'
             end as trip_distance_range,
             user_type,
             age,
@@ -40,8 +40,8 @@ with
             end_location
 
         from source
-        where weather_wid is not null
-        and date_part(year, start_time) = {{env_var('DBT_PROCESSING_YEAR')}}
+        -- where weather_wid is not null
+        -- and date_part(year, start_time) = {{env_var('DBT_PROCESSING_YEAR')}}
 
     ),
 
