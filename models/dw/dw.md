@@ -7,7 +7,7 @@ Natural identifier for the record in the source system table.
 {% enddocs %}
 
 {% docs col_weather_detail %}
-Detailed weather description with the first letter capitalized.
+Detailed weather description.
 {% enddocs %}
 
 {% docs col_temperature_celsius %}
@@ -31,7 +31,19 @@ Flag for the current record in the slowly changing dimension.
 {% enddocs %}
 
 {% docs col_age_range %}
-The age group of the user. For example, '0-17', '18-24', '25-34', etc.
+The age group of the user. For example, '0-17', '18-24', '18-24', etc.
+
+| age_range |
+|----------|
+|0-17|
+|18-24|
+|25-34|
+|35-44|
+|45-54|
+|55-64|
+|65+|
+|Unknown|
+
 {% enddocs %}
 
 {% docs col_trip_distance_sum_km %}
@@ -39,15 +51,43 @@ Total sum of the trip distances in kilometers. For example, '1.391691853'.
 {% enddocs %}
 
 {% docs col_trip_distance_range %}
-The range of the trip's distance, usually in kilometers or miles. For example, '0-1'.
+The range of the trip's distance, usually in kilometers or miles. 
+
+|trip_distance_range|
+|-----|
+|0-1|
+|1-2|
+|2-3|
+|3-4|
+|4-5|
+|5+|
+
 {% enddocs %}
 
 {% docs col_period_of_day %}
-Categorization of the trip based on the period of day. For example, 'Morning', 'Afternoon', or 'Evening'.
+Categorization of the trip based on the period of day.
+
+|period_of_day|
+|---------|
+|Morning|
+|Afternoon|
+|Evening|
+|Night|
+
 {% enddocs %}
 
 {% docs col_trip_duration_min_range %}
-The range of the trip's duration in minutes. For example, '11-20' for a trip that lasted between 11 and 20 minutes.
+The range of the trip's duration in minutes.
+
+|trip_duration_min_range|
+|-----------------------|
+|0-10|
+|11-20|
+|21-30|
+|31-40|
+|41-50|
+|50+|
+
 {% enddocs %}
 
 {% docs col_weather_wid %}
