@@ -1,6 +1,6 @@
 with
 
-    source as (select * from {{ ref("stg_fact_trips_04") }}),
+    source as (select * from {{ ref("int_fact_trips_04") }}),
 
     trans_01 as (
 

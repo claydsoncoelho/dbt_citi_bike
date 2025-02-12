@@ -6,6 +6,9 @@ models:
     columns:
       - name: datekey
         description: "Unique identifier for each date in yyyymmdd format. Example: '20150101'."
+        tests:
+          - not_null
+          - unique
         
       - name: date
         description: "The actual date value in the format yyyy-mm-dd. Example: '2015-01-01'."

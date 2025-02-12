@@ -6,6 +6,7 @@ models:
         description: '{{ doc("col_time_readable") }}'
         tests:
           - not_null
+          - unique
 
       - name: city_name
         description: '{{ doc("col_city_name") }}'
