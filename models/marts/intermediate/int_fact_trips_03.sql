@@ -1,36 +1,27 @@
-{{ config(
-    materialized='incremental',
-    unique_key=['bike_id', 'start_time'],
-    post_hook=[
-        "update {{ ref('int_fact_trips_01') }} 
-        set metadata_processed_flag = true 
-        where metadata_processed_flag = false
-        and month_start_trip = (
-            select (min(month_start_trip))
-            from {{ ref('int_fact_trips_02') }}
-        )"
-      ],
-    alias='stg_fact_trips_03'
-) }} 
-
 with
 
     source as (select * from {{ ref("int_fact_trips_02") }}),
-    dim_weather as (select * from {{ ref("dim_weather") }}),
-    dim_date as (select * from {{ ref("dim_date") }}),
 
-    find_weather_first_try as (
+    trans_01 as (
 
         select
             bike_id,
             start_time,
-            dim_weather_start_location.time_readable,
-            dim_date.datekey as trip_date_wid,
-            dim_weather_start_location.dim_weather_wid as weather_wid,
+            trip_date_wid,
+            weather_wid,
             stop_time,
+            round(trip_duration_seconds / 60,0) as trip_duration_min,
             trip_duration,
             period_of_day,
             trip_distance_meters,
+            case
+                when trip_distance_meters between 0 and 1000 then '0-1'
+                when trip_distance_meters between 1001 and 2000 then '1-2'
+                when trip_distance_meters between 2001 and 3000 then '2-3'
+                when trip_distance_meters between 3001 and 4000 then '3-4'
+                when trip_distance_meters between 4001 and 5000 then '4-5'
+                else '5+'
+            end as trip_distance_range,
             user_type,
             age,
             age_range,
@@ -46,87 +37,33 @@ with
             end_station_id,
             end_station_latitude,
             end_station_longitude,
-            end_location,
-            start_station_latitude_min,
-            start_station_latitude_max, 
-            start_station_longitude_min,
-            start_station_longitude_max,
-            start_time_min,
-            start_time_max,
+            end_location
 
         from source
 
-        left join dim_date on source.trip_start_date = dim_date.date
-
-        -- Join with dim_weather using lat/long and time (this is the most precise join)
-        left join dim_weather dim_weather_start_location
-            on dim_weather_start_location.city_latitude between start_station_latitude_min and start_station_latitude_max
-            and dim_weather_start_location.city_longitude between start_station_longitude_min and start_station_longitude_max
-            and dim_weather_start_location.time_readable between start_time_min and start_time_max
     ),
 
-    weather_not_found as (
-
-        select * from find_weather_first_try where weather_wid is null
-
-    ),
-
-    find_weather_second_try as (
+    trans_02 as (
 
         select
             bike_id,
             start_time,
-            dim_weather_start_location.time_readable,
-            trip_date_wid,
-            dim_weather_start_location.dim_weather_wid as weather_wid,
-            stop_time,
-            trip_duration,
-            period_of_day,
-            trip_distance_meters,
-            user_type,
-            age,
-            age_range,
-            gender,
-            birth_year,
-            start_station_name,
-            end_station_name,
-            trip_duration_seconds,
-            start_station_id,
-            start_station_latitude,
-            start_station_longitude,
-            start_location,
-            end_station_id,
-            end_station_latitude,
-            end_station_longitude,
-            end_location,
-            start_station_latitude_min,
-            start_station_latitude_max, 
-            start_station_longitude_min,
-            start_station_longitude_max,
-            start_time_min,
-            start_time_max,
-        from weather_not_found
-
-        -- Join with dim_weather using lat/long and date (loose join to try to fill gaps in Dim_Weather).
-        left join dim_weather dim_weather_start_location
-            on dim_weather_start_location.city_latitude between start_station_latitude_min and start_station_latitude_max
-            and dim_weather_start_location.city_longitude between start_station_longitude_min and start_station_longitude_max
-            and cast(dim_weather_start_location.time_readable as date) = cast(start_time as date)
-
-    ),
-
-    merge_both_results as (
-
-        select
-            bike_id,
-            start_time,
-            time_readable,
             trip_date_wid,
             weather_wid,
             stop_time,
+            trip_duration_min,
+            case
+                when trip_duration_min between 0 and 10 then '0-10'
+                when trip_duration_min between 11 and 20 then '11-20'
+                when trip_duration_min between 21 and 30 then '21-30'
+                when trip_duration_min between 31 and 40 then '31-40'
+                when trip_duration_min between 41 and 50 then '41-50'
+                else '50+'
+            end as trip_duration_min_range,
             trip_duration,
             period_of_day,
             trip_distance_meters,
+            trip_distance_range,
             user_type,
             age,
             age_range,
@@ -143,83 +80,39 @@ with
             end_station_latitude,
             end_station_longitude,
             end_location
-        from find_weather_first_try where weather_wid is not null
-        
-        union
 
-        select
-            bike_id,
-            start_time,
-            time_readable,
-            trip_date_wid,
-            weather_wid,
-            stop_time,
-            trip_duration,
-            period_of_day,
-            trip_distance_meters,
-            user_type,
-            age,
-            age_range,
-            gender,
-            birth_year,
-            start_station_name,
-            end_station_name,
-            trip_duration_seconds,
-            start_station_id,
-            start_station_latitude,
-            start_station_longitude,
-            start_location,
-            end_station_id,
-            end_station_latitude,
-            end_station_longitude,
-            end_location
-        from find_weather_second_try
+        from trans_01
 
     ),
 
-    prepare_duplicated as (
+    trans_03 as (
 
         select
-            bike_id,
-            start_time,
-
-            --Difference between the star_trip time and the weather time. 
-            --Will be used to choose the best record in case of duplication
-            datediff('minute', start_time, time_readable) as trip_weather_time_diff,
-
+            count(1) as trip_count,
+            sum(trip_distance_meters) / 1000 as trip_distance_sum_km,
             trip_date_wid,
             weather_wid,
-            stop_time,
-            trip_duration,
+            trip_duration_min_range,
             period_of_day,
-            trip_distance_meters,
+            trip_distance_range,
             user_type,
-            age,
             age_range,
-            gender,
-            birth_year,
-            start_station_name,
-            end_station_name,
-            trip_duration_seconds,
-            start_station_id,
-            start_station_latitude,
-            start_station_longitude,
-            start_location,
-            end_station_id,
-            end_station_latitude,
-            end_station_longitude,
-            end_location
-        from merge_both_results
+            gender
 
-    ),
+        from trans_02
 
-
-    remove_duplicated as (
-
-        {{ dbt_utils.deduplicate('prepare_duplicated', 'bike_id, start_time', 'trip_weather_time_diff') }}
+        group by 
+            trip_date_wid,
+            weather_wid,
+            trip_duration_min_range,
+            period_of_day,
+            trip_distance_range,
+            user_type,
+            age_range,
+            gender
 
     )
 
 
 select *
-from remove_duplicated
+from trans_03

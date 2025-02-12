@@ -1,10 +1,10 @@
 {% set old_query %}
   select
-    bike_id,
-    start_time,
-    stop_time
-  from {{ ref('stg_citi_bike_trips_01') }}
-  where start_time <= '2016-12-31 23:59:56.000'
+    bikeid as bike_id,
+    starttime as start_time,
+    stoptime as stop_time
+  from {{ source("source_citi_bike", "trips") }}
+  where starttime <= ( select max(start_time) from {{ ref('int_fact_trips_02') }} )
 {% endset %}
 
 {% set new_query %}
@@ -12,23 +12,24 @@
     bike_id,
     start_time,
     stop_time
-  from {{ ref('int_fact_trips_03') }}
+  from {{ ref('int_fact_trips_02') }}
 {% endset %}
 
-with result as (
+with problems as (
     {{ 
         audit_helper.compare_and_classify_query_results(
             old_query, 
             new_query, 
             primary_key_columns=['bike_id', 'start_time'], 
             columns=['stop_time'],
-            sample_limit = 1000000
+            sample_limit = 10000000
         )
     }}
 )
 
-select * from result
+select * from problems
 where dbt_audit_row_status <> 'identical'
+order by start_time
 
 
 --  set models_to_generate = codegen.get_models(directory='marts/intermediate', prefix='int_') 

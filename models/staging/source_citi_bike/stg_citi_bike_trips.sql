@@ -1,13 +1,20 @@
 {{ config(
     materialized='incremental',
-    unique_key=['bike_id', 'start_time']
+    unique_key=['bike_id', 'start_time'],
+    post_hook=[
+        "delete from {{ this }} 
+         where start_time_year_month < (
+            select max(start_time_year_month)
+            from {{ this }}
+         )"
+    ]
 ) }}
 
 with
 
     source as (select * from {{ source("source_citi_bike", "trips") }}),
 
-    renamed as (
+    add_new_columns as (
 
         select
             bikeid AS bike_id,
@@ -29,19 +36,14 @@ with
             gender AS gender,
             metadata_filename AS metadata_filename,
             metadata_file_row_number AS metadata_file_row_number,
-            metadata_file_last_modified AS metadata_file_last_modified
+            metadata_file_last_modified AS metadata_file_last_modified,
+            to_varchar(starttime, 'YYYYMM') as start_time_year_month
+
         from source
-        {% if is_incremental() %}
-        where metadata_file_last_modified >= 
-            COALESCE(
-                (select max(metadata_file_last_modified) from {{ this }}),
-                '1900-01-01'::timestamp
-            )
-        {% endif %}
 
     ),
 
-    location as (
+    incremental_logic as (
 
         select
             bike_id,
@@ -66,10 +68,28 @@ with
             metadata_filename,
             metadata_file_row_number,
             metadata_file_last_modified,
-            false as metadata_processed_flag
-        from renamed
+            start_time_year_month
+        from add_new_columns
+
+        {% if is_incremental() %}
+
+            where start_time >= (
+                select max(start_time) from {{ this }}
+            )
+            and start_time <= (
+                select dateadd(month, 1, max(start_time)) from {{ this }}
+            )
+
+        {% else %}
+
+            where start_time_year_month = (
+                select min(start_time_year_month) from add_new_columns
+            )
+
+        {% endif %}
 
     )
 
+
 select *
-from location
+from incremental_logic
