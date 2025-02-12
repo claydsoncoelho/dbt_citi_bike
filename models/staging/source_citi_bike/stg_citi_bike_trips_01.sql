@@ -5,7 +5,7 @@
 
 with
 
-    source as (select * from {{ source("citi_bike", "trips") }}),
+    source as (select * from {{ source("source_citi_bike", "trips") }}),
 
     renamed as (
 

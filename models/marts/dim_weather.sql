@@ -9,7 +9,7 @@
 ) }}  
 
 {{ create_scd_type_2(
-    source_table = 'stg_dim_weather'
+    source_table = 'int_dim_weather'
     , table_name = 'dim_weather'
     , key_col = 'time_readable'
     , timestamp_col = 'transaction_datetime'

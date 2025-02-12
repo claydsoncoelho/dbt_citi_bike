@@ -1,6 +1,7 @@
 {{ config(
     materialized='incremental',
-    unique_key=['bike_id', 'start_time']
+    unique_key=['bike_id', 'start_time'],
+    alias='stg_fact_trips_01'
 ) }}
 
 with
