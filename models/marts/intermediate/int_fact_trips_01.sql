@@ -1,12 +1,18 @@
 {{ config(
     materialized='incremental',
     unique_key=['bike_id', 'start_time'],
-    alias='stg_fact_trips_01'
+    post_hook=[
+        "delete from {{ this }} 
+         where start_time_year_month < (
+            select max(start_time_year_month)
+            from {{ this }}
+         )"
+    ]
 ) }}
 
 with
 
-    source as (select * from {{ ref("snap_stg_citi_bike_trips") }} where date_part(year, start_time) = {{env_var('DBT_PROCESSING_YEAR')}}),
+    source as (select * from {{ ref("snap_stg_citi_bike_trips") }}),
 
     prepare_filter as (
 
@@ -30,15 +36,17 @@ with
             start_location_geography,
             end_location_geography,
             gender,
-            date_part(year, start_time) as year_start_trip,
-            date_part(month, start_time) as month_start_trip
+            start_time_year_month
 
         from source
 
         where dbt_valid_to = to_date('9999-12-31')
         {% if is_incremental() %}
             and start_time >= (
-                    select max(start_time) as start_time from {{ this }}
+                select max(start_time) from {{ this }}
+            )
+            and start_time <= (
+                select dateadd(month, 1, max(start_time)) from {{ this }}
             )
         {% endif %}
 
@@ -106,8 +114,7 @@ with
             end_station_latitude,
             end_station_longitude,
             end_location,
-            year_start_trip,
-            month_start_trip
+            start_time_year_month
 
         from prepare_filter
         
@@ -163,9 +170,7 @@ with
             end_station_latitude,
             end_station_longitude,
             end_location,
-            year_start_trip,
-            month_start_trip,
-            false as metadata_processed_flag
+            start_time_year_month
 
         from stg_fact_01
     )

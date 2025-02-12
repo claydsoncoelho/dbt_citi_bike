@@ -1,6 +1,5 @@
 {{ config(
-    materialized='ephemeral',
-    alias='stg_dim_weather'
+    materialized='ephemeral'
 ) }}
 
 with

@@ -160,143 +160,6 @@ models:
           - bike_id
           - start_time
     columns:
-      - name: start_time_min
-        data_type: timestamp_ntz
-        description: ""
-
-      - name: start_time_max
-        data_type: timestamp_ntz
-        description: ""
-
-      - name: start_station_latitude_min
-        data_type: float
-        description: ""
-
-      - name: start_station_latitude_max
-        data_type: float
-        description: ""
-
-      - name: start_station_longitude_min
-        data_type: float
-        description: ""
-
-      - name: start_station_longitude_max
-        data_type: float
-        description: ""
-
-      - name: bike_id
-        data_type: number
-        description: ""
-        tests:
-          - not_null
-
-      - name: start_time
-        data_type: timestamp_ntz
-        description: ""
-        tests:
-          - not_null
-
-      - name: trip_start_date
-        data_type: date
-        description: ""
-
-      - name: stop_time
-        data_type: timestamp_ntz
-        description: ""
-
-      - name: trip_duration
-        data_type: time
-        description: ""
-
-      - name: period_of_day
-        data_type: varchar
-        description: ""
-
-      - name: trip_distance_meters
-        data_type: float
-        description: ""
-
-      - name: user_type
-        data_type: varchar
-        description: ""
-
-      - name: age
-        data_type: number
-        description: ""
-
-      - name: age_range
-        data_type: varchar
-        description: ""
-
-      - name: gender
-        data_type: varchar
-        description: ""
-
-      - name: birth_year
-        data_type: number
-        description: ""
-
-      - name: start_station_name
-        data_type: varchar
-        description: ""
-
-      - name: end_station_name
-        data_type: varchar
-        description: ""
-
-      - name: trip_duration_seconds
-        data_type: number
-        description: ""
-
-      - name: start_station_id
-        data_type: number
-        description: ""
-
-      - name: start_station_latitude
-        data_type: float
-        description: ""
-
-      - name: start_station_longitude
-        data_type: float
-        description: ""
-
-      - name: start_location
-        data_type: varchar
-        description: ""
-
-      - name: end_station_id
-        data_type: number
-        description: ""
-
-      - name: end_station_latitude
-        data_type: float
-        description: ""
-
-      - name: end_station_longitude
-        data_type: float
-        description: ""
-
-      - name: end_location
-        data_type: varchar
-        description: ""
-
-      - name: year_start_trip
-        data_type: number
-        description: ""
-
-      - name: month_start_trip
-        data_type: number
-        description: ""
-
-
-  - name: int_fact_trips_03
-    description: "Fact Trips intermediate stage step 03."
-    tests:
-    - dbt_utils.unique_combination_of_columns:
-        combination_of_columns:
-          - bike_id
-          - start_time
-    columns:
       - name: bike_id
         data_type: number
         description: ""
@@ -398,18 +261,18 @@ models:
         description: ""
 
 
-  - name: int_fact_trips_04
-    description: "Fact Trips intermediate stage step 04."
+  - name: int_fact_trips_03
+    description: "Fact Trips intermediate stage step 03."
     tests:
     - dbt_utils.unique_combination_of_columns:
         combination_of_columns:
-          - trip_date_wid,
-          - weather_wid,
-          - trip_duration_min_range,
-          - period_of_day,
-          - trip_distance_range,
-          - user_type,
-          - age_range,
+          - trip_date_wid
+          - weather_wid
+          - trip_duration_min_range
+          - period_of_day
+          - trip_distance_range
+          - user_type
+          - age_range
           - gender
     columns:
       - name: trip_count
