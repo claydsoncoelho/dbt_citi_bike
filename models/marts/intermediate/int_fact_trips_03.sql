@@ -2,19 +2,20 @@
     materialized='incremental',
     unique_key=['bike_id', 'start_time'],
     post_hook=[
-        "update {{ ref('stg_fact_trips_01') }} 
+        "update {{ ref('int_fact_trips_01') }} 
         set metadata_processed_flag = true 
         where metadata_processed_flag = false
         and month_start_trip = (
             select (min(month_start_trip))
-            from {{ ref('stg_fact_trips_02') }}
+            from {{ ref('int_fact_trips_02') }}
         )"
-      ]
+      ],
+    alias='stg_fact_trips_03'
 ) }} 
 
 with
 
-    source as (select * from {{ ref("stg_fact_trips_02") }}),
+    source as (select * from {{ ref("int_fact_trips_02") }}),
     dim_weather as (select * from {{ ref("dim_weather") }}),
     dim_date as (select * from {{ ref("dim_date") }}),
 

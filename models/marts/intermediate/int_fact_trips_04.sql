@@ -1,6 +1,12 @@
+{{
+    config(
+        alias='stg_fact_trips_04'
+    )
+}}
+
 with
 
-    source as (select * from {{ ref("stg_fact_trips_03") }}),
+    source as (select * from {{ ref("int_fact_trips_03") }}),
 
     trans_01 as (
 

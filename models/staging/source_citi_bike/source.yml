@@ -1,0 +1,16 @@
+version: 2
+
+sources:
+  - name: source_citi_bike
+    description: This is the Citi Bike source system.
+    database: RAW
+    schema: citi_bike
+    freshness: # default freshness
+      warn_after: {count: 12, period: day}
+      error_after: {count: 24, period: day}
+    loaded_at_field: METADATA_FILE_LAST_MODIFIED
+    tables:
+      - name: trips
+        description: This table contains csv data from source trips.
+      - name: weather_nyc
+        description: This table contains json data from New York weather.

@@ -7,12 +7,13 @@
         'start_station_latitude_max',
         'start_station_longitude_min',
         'start_station_longitude_max'
-    ]
+    ],
+    alias='stg_fact_trips_02'
 ) }}   
 
 with
 
-    source as (select * from {{ ref("stg_fact_trips_01") }}),
+    source as (select * from {{ ref("int_fact_trips_01") }}),
 
     filtered as (
 

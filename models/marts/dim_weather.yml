@@ -4,6 +4,9 @@ models:
     columns:
       - name: dim_weather_wid
         description: '{{ doc("col_dim_weather_wid") }}'
+        tests:
+          - not_null
+          - unique
 
       - name: dim_weather_sid
         description: '{{ doc("col_dim_weather_sid") }}'
