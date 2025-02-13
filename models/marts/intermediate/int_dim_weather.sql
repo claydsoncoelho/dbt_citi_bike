@@ -26,7 +26,7 @@ with
             wind_deg,
             city_id,
             city_findname,
-            dbt_updated_at as transaction_datetime,
+            dbt_updated_at
         from source
 
     )

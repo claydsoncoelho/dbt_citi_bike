@@ -7,8 +7,8 @@ with
         select
             bike_id,
             start_time,
-            trip_date_wid,
-            weather_wid,
+            dim_trip_date_id,
+            scd_dim_weather_id,
             stop_time,
             round(trip_duration_seconds / 60,0) as trip_duration_min,
             trip_duration,
@@ -48,8 +48,8 @@ with
         select
             bike_id,
             start_time,
-            trip_date_wid,
-            weather_wid,
+            dim_trip_date_id,
+            scd_dim_weather_id,
             stop_time,
             trip_duration_min,
             case
@@ -90,8 +90,8 @@ with
         select
             count(1) as trip_count,
             sum(trip_distance_meters) / 1000 as trip_distance_sum_km,
-            trip_date_wid,
-            weather_wid,
+            dim_trip_date_id,
+            scd_dim_weather_id,
             trip_duration_min_range,
             period_of_day,
             trip_distance_range,
@@ -102,8 +102,8 @@ with
         from trans_02
 
         group by 
-            trip_date_wid,
-            weather_wid,
+            dim_trip_date_id,
+            scd_dim_weather_id,
             trip_duration_min_range,
             period_of_day,
             trip_distance_range,
