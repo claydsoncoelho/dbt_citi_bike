@@ -90,11 +90,11 @@ The range of the trip's duration in minutes.
 
 {% enddocs %}
 
-{% docs col_weather_wid %}
+{% docs col_scd_dim_weather_id %}
 Foreign key referencing the Dim_Weather dimension table.
 {% enddocs %}
 
-{% docs col_trip_date_wid %}
+{% docs col_dim_trip_date_id %}
 Foreign key referencing the Dim_Date` dimension table, representing the date on which the trip occurred. For example, '20150101' for 1st January , 2015.
 {% enddocs %}
 

@@ -172,11 +172,11 @@ models:
         tests:
           - not_null
 
-      - name: trip_date_wid
+      - name: dim_trip_date_id
         data_type: number
         description: ""
 
-      - name: weather_wid
+      - name: scd_dim_weather_wid
         data_type: varchar
         description: ""
 
@@ -266,8 +266,8 @@ models:
     tests:
     - dbt_utils.unique_combination_of_columns:
         combination_of_columns:
-          - trip_date_wid
-          - weather_wid
+          - dim_trip_date_id
+          - scd_dim_weather_id
           - trip_duration_min_range
           - period_of_day
           - trip_distance_range
@@ -285,11 +285,11 @@ models:
         data_type: float
         description: ""
 
-      - name: trip_date_wid
+      - name: dim_trip_date_id
         data_type: number
         description: ""
 
-      - name: weather_wid
+      - name: scd_dim_weather_id
         data_type: varchar
         description: ""
 

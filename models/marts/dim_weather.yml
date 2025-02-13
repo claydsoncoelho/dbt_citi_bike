@@ -2,7 +2,7 @@ models:
   - name: dim_weather
     description: 'This table extracts weather data for New York City and includes various weather metrics and geolocation information.'
     columns:
-      - name: dim_weather_wid
+      - name: scd_dim_weather_id
         description: '{{ doc("col_dim_weather_wid") }}'
         tests:
           - not_null
@@ -59,12 +59,12 @@ models:
       - name: city_findname
         description: '{{ doc("col_city_findname") }}'
 
-      - name: valid_from
+      - name: scd_valid_from
         description: '{{ doc("col_valid_from") }}'
 
-      - name: valid_to
+      - name: scd_valid_to
         description: '{{ doc("col_valid_to") }}'
 
-      - name: current_row
+      - name: scd_current_flag
         description: '{{ doc("col_current_row") }}'
 

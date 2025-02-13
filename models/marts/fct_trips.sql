@@ -6,8 +6,8 @@ with
 
         select
             trip_count,
-            trip_date_wid,
-            weather_wid,
+            dim_trip_date_id,
+            scd_dim_weather_id,
             trip_duration_min_range,
             period_of_day,
             trip_distance_range,

@@ -6,8 +6,8 @@ models:
     tests:
     - dbt_utils.unique_combination_of_columns:
         combination_of_columns:
-          - trip_date_wid
-          - weather_wid
+          - dim_trip_date_id
+          - scd_dim_weather_id
           - trip_duration_min_range
           - period_of_day
           - trip_distance_range
@@ -20,11 +20,11 @@ models:
       - name: trip_count
         description: '{{ doc("col_trip_count") }}'
         
-      - name: trip_date_wid
-        description: '{{ doc("col_trip_date_wid") }}'
+      - name: dim_trip_date_id
+        description: '{{ doc("col_dim_trip_date_id") }}'
         
-      - name: weather_wid
-        description: '{{ doc("col_weather_wid") }}'
+      - name: scd_dim_weather_id
+        description: '{{ doc("col_scd_dim_weather_id") }}'
         
       - name: trip_duration_min_range
         description: '{{ doc("col_trip_duration_min_range") }}'
