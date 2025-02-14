@@ -1,0 +1,18 @@
+version: 2
+
+exposures:
+  - name: exp_citi_bike_dash_power_bi
+    label: Citi Bike Trips
+    type: dashboard
+    maturity: high
+    url: https://app.powerbi.com/links/fl6JhFanfb?ctid=a51288de-b781-43b3-9666-50b41f408a2b&pbi_source=linkShare
+    description: >
+      Citi Bike Dashboard created in Power BI.
+
+    depends_on:
+      - ref("fct_trips")
+      - ref("dim_date")
+      - ref("dim_weather")
+    owner:
+      name: Clay Coelho
+      email: claydson@gmail.com

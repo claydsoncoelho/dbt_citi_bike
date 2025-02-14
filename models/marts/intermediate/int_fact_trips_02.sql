@@ -15,7 +15,7 @@ with
             source.bike_id,
             source.start_time,
             dim_weather_start_location.time_readable,
-            dim_date.datekey as dim_trip_date_id,
+            dim_date.dim_date_id as dim_date_id_trip,
             dim_weather_start_location.scd_dim_weather_id,
             source.stop_time,
             source.trip_duration,
@@ -53,6 +53,7 @@ with
             on dim_weather_start_location.city_latitude between start_station_latitude_min and start_station_latitude_max
             and dim_weather_start_location.city_longitude between start_station_longitude_min and start_station_longitude_max
             and dim_weather_start_location.time_readable between start_time_min and start_time_max
+            and source.start_time between dim_weather_start_location.scd_valid_from and dim_weather_start_location.scd_valid_to
     ),
 
     weather_not_found as (
@@ -67,7 +68,7 @@ with
             weather_not_found.bike_id,
             weather_not_found.start_time,
             dim_weather_start_location.time_readable,
-            weather_not_found.dim_trip_date_id,
+            weather_not_found.dim_date_id_trip,
             dim_weather_start_location.scd_dim_weather_id,
             weather_not_found.stop_time,
             weather_not_found.trip_duration,
@@ -103,6 +104,7 @@ with
             on dim_weather_start_location.city_latitude between start_station_latitude_min and start_station_latitude_max
             and dim_weather_start_location.city_longitude between start_station_longitude_min and start_station_longitude_max
             and cast(dim_weather_start_location.time_readable as date) = cast(start_time as date)
+            and weather_not_found.start_time between dim_weather_start_location.scd_valid_from and dim_weather_start_location.scd_valid_to
 
     ),
 
@@ -112,7 +114,7 @@ with
             bike_id,
             start_time,
             time_readable,
-            dim_trip_date_id,
+            dim_date_id_trip,
             scd_dim_weather_id,
             stop_time,
             trip_duration,
@@ -142,7 +144,7 @@ with
             bike_id,
             start_time,
             time_readable,
-            dim_trip_date_id,
+            dim_date_id_trip,
             scd_dim_weather_id,
             stop_time,
             trip_duration,
@@ -178,7 +180,7 @@ with
             --Will be used to choose the best record in case of duplication
             datediff('minute', start_time, time_readable) as trip_weather_time_diff,
 
-            dim_trip_date_id,
+            dim_date_id_trip,
             scd_dim_weather_id,
             stop_time,
             trip_duration,

@@ -1,9 +1,5 @@
-{% docs col_dim_weather_wid %}
+{% docs col_dim_weather_id %}
 Unique identifier for the record in the slowly changing dimension (SCD) table.
-{% enddocs %}
-
-{% docs col_dim_weather_sid %}
-Natural identifier for the record in the source system table.
 {% enddocs %}
 
 {% docs col_weather_detail %}
@@ -94,7 +90,7 @@ The range of the trip's duration in minutes.
 Foreign key referencing the Dim_Weather dimension table.
 {% enddocs %}
 
-{% docs col_dim_trip_date_id %}
+{% docs col_dim_date_id_trip %}
 Foreign key referencing the Dim_Date` dimension table, representing the date on which the trip occurred. For example, '20150101' for 1st January , 2015.
 {% enddocs %}
 

@@ -1,21 +1,17 @@
-{{ config(
-    materialized='incremental',
-    unique_key=['bike_id', 'start_time'],
-    post_hook=[
-        "delete from {{ this }} 
-         where start_time_year_month < (
-            select max(start_time_year_month)
-            from {{ this }}
-         )"
-    ]
-) }}
+{# Getting wartermark... #}
+{%- set last_extracted_date -%}
+    '{{ get_watermark(
+        database_name='stg_dw', 
+        table_name='int_fact_trips_02', 
+        column_name='start_time', 
+        default_value='2016-07-01 00:00:02.000'
+    ) }}'
+{%- endset -%}
 
 with
-
     source as (select * from {{ source("source_citi_bike", "trips") }}),
 
     add_new_columns as (
-
         select
             bikeid AS bike_id,
             starttime AS start_time,
@@ -40,11 +36,10 @@ with
             to_varchar(starttime, 'YYYYMM') as start_time_year_month
 
         from source
-
+        where starttime between {{ last_extracted_date }} and dateadd(day, 30, {{ last_extracted_date }})
     ),
 
     incremental_logic as (
-
         select
             bike_id,
             start_time,
@@ -70,24 +65,6 @@ with
             metadata_file_last_modified,
             start_time_year_month
         from add_new_columns
-
-        {% if is_incremental() %}
-
-            where start_time >= (
-                select max(start_time) from {{ this }}
-            )
-            and start_time <= (
-                select dateadd(month, 1, max(start_time)) from {{ this }}
-            )
-
-        {% else %}
-
-            where start_time_year_month = (
-                select min(start_time_year_month) from add_new_columns
-            )
-
-        {% endif %}
-
     )
 
 

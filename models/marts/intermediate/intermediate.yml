@@ -172,7 +172,7 @@ models:
         tests:
           - not_null
 
-      - name: dim_trip_date_id
+      - name: dim_date_id_trip
         data_type: number
         description: ""
 
@@ -257,62 +257,5 @@ models:
         description: ""
 
       - name: end_location
-        data_type: varchar
-        description: ""
-
-
-  - name: int_fact_trips_03
-    description: "Fact Trips intermediate stage step 03."
-    tests:
-    - dbt_utils.unique_combination_of_columns:
-        combination_of_columns:
-          - dim_trip_date_id
-          - scd_dim_weather_id
-          - trip_duration_min_range
-          - period_of_day
-          - trip_distance_range
-          - user_type
-          - age_range
-          - gender
-    columns:
-      - name: trip_count
-        data_type: number
-        description: ""
-        tests:
-          - not_null
-
-      - name: trip_distance_sum_km
-        data_type: float
-        description: ""
-
-      - name: dim_trip_date_id
-        data_type: number
-        description: ""
-
-      - name: scd_dim_weather_id
-        data_type: varchar
-        description: ""
-
-      - name: trip_duration_min_range
-        data_type: varchar
-        description: ""
-
-      - name: period_of_day
-        data_type: varchar
-        description: ""
-
-      - name: trip_distance_range
-        data_type: varchar
-        description: ""
-
-      - name: user_type
-        data_type: varchar
-        description: ""
-
-      - name: age_range
-        data_type: varchar
-        description: ""
-
-      - name: gender
         data_type: varchar
         description: ""
