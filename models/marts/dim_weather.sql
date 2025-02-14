@@ -1,6 +1,5 @@
 
 {{ config(
-    materialized='table',
     cluster_by=[
         'time_readable',
         'city_latitude',
@@ -8,13 +7,11 @@
     ]
 ) }}  
 
-{{ create_scd_type_2(
-    source_table = 'int_dim_weather'
-    , table_name = 'dim_weather'
-    , key_col = 'time_readable'
-    , timestamp_col = 'transaction_datetime'
-    , included_cols = [
-        'time_readable',
+{{ scd_type_2(
+    source_model_name = 'int_dim_weather',
+    target_table_name = 'dim_weather',
+    key_col = 'time_readable',
+    other_cols = [
         'country',
         'city_name',
         'weather_main',
@@ -30,5 +27,6 @@
         'wind_deg',
         'city_id',
         'city_findname'
-	]
+	],
+    timestamp_col = 'dbt_updated_at'
 ) }}

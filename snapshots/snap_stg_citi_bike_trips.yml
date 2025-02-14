@@ -1,6 +1,6 @@
 snapshots:
   - name: snap_stg_citi_bike_trips
-    relation: ref('stg_citi_bike_trips_02')
+    relation: ref('stg_citi_bike_trips')
     docs:
       show: true
     config:
@@ -10,8 +10,3 @@ snapshots:
         - start_time
       strategy: timestamp
       updated_at: metadata_file_last_modified
-      post_hook: [
-        "update {{ ref('stg_citi_bike_trips_01') }} 
-         set metadata_processed_flag = true 
-         where metadata_processed_flag = false"
-      ]

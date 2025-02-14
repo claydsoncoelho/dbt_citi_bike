@@ -1,14 +1,17 @@
-{{ config(
-    materialized='incremental',
-    unique_key=['bike_id', 'start_time']
-) }}
+{# Getting wartermark... #}
+{%- set last_extracted_date -%}
+    '{{ get_watermark(
+        database_name='stg_dw', 
+        table_name='int_fact_trips_02', 
+        column_name='start_time', 
+        default_value='2016-07-01 00:00:02.000'
+    ) }}'
+{%- endset -%}
 
 with
-
     source as (select * from {{ source("source_citi_bike", "trips") }}),
 
-    renamed as (
-
+    add_new_columns as (
         select
             bikeid AS bike_id,
             starttime AS start_time,
@@ -29,20 +32,14 @@ with
             gender AS gender,
             metadata_filename AS metadata_filename,
             metadata_file_row_number AS metadata_file_row_number,
-            metadata_file_last_modified AS metadata_file_last_modified
-        from source
-        {% if is_incremental() %}
-        where metadata_file_last_modified >= 
-            COALESCE(
-                (select max(metadata_file_last_modified) from {{ this }}),
-                '1900-01-01'::timestamp
-            )
-        {% endif %}
+            metadata_file_last_modified AS metadata_file_last_modified,
+            to_varchar(starttime, 'YYYYMM') as start_time_year_month
 
+        from source
+        where starttime between {{ last_extracted_date }} and dateadd(day, 30, {{ last_extracted_date }})
     ),
 
-    location as (
-
+    incremental_logic as (
         select
             bike_id,
             start_time,
@@ -66,10 +63,10 @@ with
             metadata_filename,
             metadata_file_row_number,
             metadata_file_last_modified,
-            false as metadata_processed_flag
-        from renamed
-
+            start_time_year_month
+        from add_new_columns
     )
 
+
 select *
-from location
+from incremental_logic
