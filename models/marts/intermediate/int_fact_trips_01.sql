@@ -1,15 +1,22 @@
 {{ config(
-    materialized='incremental',
-    unique_key=['bike_id', 'start_time'],
-    alias='stg_fact_trips_01'
+    materialized='table'
 ) }}
+
+{# Getting wartermark... #}
+{%- set last_extracted_date -%}
+    '{{ get_watermark(
+        database_name='stg_dw', 
+        table_name='int_fact_trips_02', 
+        column_name='start_time', 
+        default_value='2016-07-01 00:00:02.000'
+    ) }}'
+{%- endset -%}
 
 with
 
-    source as (select * from {{ ref("snap_stg_citi_bike_trips") }} where date_part(year, start_time) = {{env_var('DBT_PROCESSING_YEAR')}}),
+    source as (select * from {{ ref("snap_stg_citi_bike_trips") }}),
 
     prepare_filter as (
-
         select 
             bike_id,
             start_time,
@@ -30,24 +37,15 @@ with
             start_location_geography,
             end_location_geography,
             gender,
-            date_part(year, start_time) as year_start_trip,
-            date_part(month, start_time) as month_start_trip
+            start_time_year_month
 
         from source
 
-        where dbt_valid_to = to_date('9999-12-31')
-        {% if is_incremental() %}
-            and start_time >= (
-                    select max(start_time) as start_time from {{ this }}
-            )
-        {% endif %}
-
+        where start_time between {{ last_extracted_date }} and dateadd(day, 30, {{ last_extracted_date }})
     ),
 
     stg_fact_01 as (
-
         select
-
             -- Time tolerance 120 min. The weather table has records with interval of around 2 hours.
             dateadd(minute, -120, start_time) as start_time_min,
             dateadd(minute, 120, start_time) as start_time_max,
@@ -106,15 +104,11 @@ with
             end_station_latitude,
             end_station_longitude,
             end_location,
-            year_start_trip,
-            month_start_trip
-
+            start_time_year_month
         from prepare_filter
-        
     ),
 
     stg_fact_02 as (
-
         select
             start_time_min,
             start_time_max,
@@ -163,12 +157,10 @@ with
             end_station_latitude,
             end_station_longitude,
             end_location,
-            year_start_trip,
-            month_start_trip,
-            false as metadata_processed_flag
-
+            start_time_year_month
         from stg_fact_01
     )
+
 
 select *
 from stg_fact_02
