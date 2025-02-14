@@ -1,12 +1,14 @@
 version: 2
 
 models:
+
   - name: fct_trips
     description: "Fact table containing trip-related data, including trip counts, durations, distances, weather and demographics of the users."
+    access: public
     tests:
     - dbt_utils.unique_combination_of_columns:
         combination_of_columns:
-          - dim_trip_date_id
+          - dim_date_id_trip
           - scd_dim_weather_id
           - trip_duration_min_range
           - period_of_day
@@ -20,8 +22,8 @@ models:
       - name: trip_count
         description: '{{ doc("col_trip_count") }}'
         
-      - name: dim_trip_date_id
-        description: '{{ doc("col_dim_trip_date_id") }}'
+      - name: dim_date_id_trip
+        description: '{{ doc("col_dim_date_id_trip") }}'
         
       - name: scd_dim_weather_id
         description: '{{ doc("col_scd_dim_weather_id") }}'
@@ -46,3 +48,4 @@ models:
         
       - name: gender
         description: '{{ doc("col_gender") }}'
+

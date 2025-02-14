@@ -1,6 +1,5 @@
 
 {{ config(
-    materialized='table',
     cluster_by=[
         'time_readable',
         'city_latitude',

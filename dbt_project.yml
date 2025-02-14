@@ -43,28 +43,38 @@ models:
   citi_bike:
     marts:
       +database: DW
-      +materialized: view
+      +materialized: table
+      +docs:
+        node_color: "#132a13"
       intermediate:
         +database: STG_DW
         +materialized: view
+        +docs:
+          node_color: "#004b23"
 
     staging:
       +database: STG_DATASTORE
       +materialized: view
+      +docs:
+        node_color: "#008000"
 
-    dbt_project_evaluator:
-      +database: STG_DATASTORE
+  dbt_project_evaluator:
+    +database: DBT_PROJECT_EVALUATOR
 
     
 snapshots:
   citi_bike:
     +target_database: DATASTORE
     +dbt_valid_to_current: "to_date('9999-12-31')"
+    +docs:
+      node_color: "#006400"
     
 
 seeds:
   citi_bike:
     +database: DATASTORE
+    +docs:
+      node_color: "#38b000"
 
 # dbt_project_evaluator macro to test project's development quality
 dispatch:

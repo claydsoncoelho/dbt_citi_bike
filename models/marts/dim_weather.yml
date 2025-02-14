@@ -1,15 +1,13 @@
 models:
   - name: dim_weather
     description: 'This table extracts weather data for New York City and includes various weather metrics and geolocation information.'
+    access: public
     columns:
       - name: scd_dim_weather_id
-        description: '{{ doc("col_dim_weather_wid") }}'
+        description: '{{ doc("col_dim_weather_id") }}'
         tests:
           - not_null
           - unique
-
-      - name: dim_weather_sid
-        description: '{{ doc("col_dim_weather_sid") }}'
 
       - name: time_readable
         description: '{{ doc("col_time_readable") }}'
