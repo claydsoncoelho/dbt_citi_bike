@@ -36,7 +36,8 @@ with
             to_varchar(starttime, 'YYYYMM') as start_time_year_month
 
         from source
-        where starttime between {{ last_extracted_date }} and dateadd(day, 30, {{ last_extracted_date }})
+        where start_station_latitude > 0 
+        and starttime between {{ last_extracted_date }} and dateadd(day, {{ env_var('DBT_EXTRACTION_WINDOW_IN_DAYS') }}, {{ last_extracted_date }})
     ),
 
     incremental_logic as (

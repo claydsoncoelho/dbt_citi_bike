@@ -1,0 +1,190 @@
+version: 2
+
+models:
+
+  - name: dim_date
+    description: "Dimension table containing detailed date attributes for time-based analysis."
+    access: public
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: dim_date_id
+        description: "Unique identifier for each date in yyyymmdd format. Example: '20150101'."
+        data_type: varchar
+        tests:
+          - not_null
+          - unique
+      - name: date
+        description: "The actual date value in date format. Example: '2015-01-01'."
+        data_type: date
+        
+      - name: month
+        description: "Month of the year. Example: '1'."
+        data_type: integer
+        
+      - name: year
+        description: "Year. Example: '2020'."
+        data_type: integer
+        
+      - name: month_name
+        description: "Name of the month. Example: 'Jan'."
+        data_type: string
+
+      - name: quarter
+        description: "Quarter of the year. Example: '1'."
+        data_type: integer
+
+
+  - name: dim_weather
+    description: 'This table extracts weather data for New York City and includes various weather metrics and geolocation information.'
+    access: public
+    config:
+      contract:
+        enforced: true
+    columns:
+      
+      - name: scd_dim_weather_id
+        description: '{{ doc("col_scd_dim_weather_id") }}'
+        data_type: varchar
+        tests:
+          - not_null
+          - unique
+
+      - name: time_readable
+        description: '{{ doc("col_time_readable") }}'
+        data_type: timestamp
+
+      - name: country
+        description: '{{ doc("col_country") }}'
+        data_type: string
+
+      - name: city_name
+        description: '{{ doc("col_city_name") }}'
+        data_type: string
+
+      - name: weather_main
+        description: '{{ doc("col_weather_main") }}'
+        data_type: string
+
+      - name: weather_detail
+        description: '{{ doc("col_weather_detail") }}'
+        data_type: string
+
+      - name: temperature_celsius
+        description: '{{ doc("col_temperature_celsius") }}'
+        data_type: float
+
+      - name: humidity
+        description: '{{ doc("col_humidity") }}'
+        data_type: numeric # Or integer if it's a whole number percentage
+
+      - name: wind_speed
+        description: '{{ doc("col_wind_speed") }}'
+        data_type: float # Or float if appropriate
+
+      - name: city_latitude
+        description: '{{ doc("col_city_latitude") }}'
+        data_type: float # Or float if appropriate
+
+      - name: city_longitude
+        description: '{{ doc("col_city_longitude") }}'
+        data_type: float # Or float if appropriate
+
+      - name: city_location
+        description: '{{ doc("col_city_location") }}'
+        data_type: string # Or geography if your database supports it
+
+      - name: temperature_kelvin
+        description: '{{ doc("col_temperature_kelvin") }}'
+        data_type: float
+
+      - name: pressure
+        description: '{{ doc("col_pressure") }}'
+        data_type: float # Or integer if it's always a whole number
+
+      - name: wind_deg
+        description: '{{ doc("col_wind_deg") }}'
+        data_type: float # Or integer if it's always a whole number
+
+      - name: city_id
+        description: '{{ doc("col_city_id") }}'
+        data_type: integer
+
+      - name: city_findname
+        description: '{{ doc("col_city_findname") }}'
+        data_type: string
+
+      - name: scd_valid_from
+        description: '{{ doc("col_valid_from") }}'
+        data_type: timestamp 
+
+      - name: scd_valid_to
+        description: '{{ doc("col_valid_to") }}'
+        data_type: timestamp 
+
+      - name: scd_current_flag
+        description: '{{ doc("col_current_row") }}'
+        data_type: varchar(1)
+
+
+  - name: fct_trips
+    description: "Fact table containing trip-related data, including trip counts, durations, distances, weather and demographics of the users."
+    access: public
+    tests:
+    - dbt_utils.unique_combination_of_columns:
+        combination_of_columns:
+          - dim_date_id_trip
+          - scd_dim_weather_id
+          - trip_duration_min_range
+          - period_of_day
+          - trip_distance_range
+          - user_type
+          - age_range
+          - gender
+    config:
+      alias: fact_trips
+      contract:
+        enforced: true
+    columns:
+      
+      - name: trip_count
+        data_type: integer
+        description: '{{ doc("col_trip_count") }}'
+        
+      - name: dim_date_id_trip
+        data_type: varchar
+        description: '{{ doc("col_dim_date_id_trip") }}'
+        
+      - name: scd_dim_weather_id
+        data_type: varchar
+        description: '{{ doc("col_scd_dim_weather_id") }}'
+        
+      - name: trip_duration_min_range
+        data_type: varchar
+        description: '{{ doc("col_trip_duration_min_range") }}'
+        
+      - name: period_of_day
+        data_type: varchar
+        description: '{{ doc("col_period_of_day") }}'
+        
+      - name: trip_distance_range
+        data_type: varchar
+        description: '{{ doc("col_trip_distance_range") }}'
+        
+      - name: trip_distance_sum_km
+        data_type: float
+        description: '{{ doc("col_trip_distance_sum_km") }}'
+        
+      - name: user_type
+        data_type: varchar
+        description: '{{ doc("col_user_type") }}'
+        
+      - name: age_range
+        data_type: varchar
+        description: '{{ doc("col_age_range") }}'
+        
+      - name: gender
+        data_type: varchar
+        description: '{{ doc("col_gender") }}'
+
