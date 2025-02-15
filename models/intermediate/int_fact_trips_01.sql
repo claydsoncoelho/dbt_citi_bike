@@ -36,12 +36,11 @@ with
             end_location,
             start_location_geography,
             end_location_geography,
-            gender,
-            start_time_year_month
+            gender
 
         from source
 
-        where start_time between {{ last_extracted_date }} and dateadd(day, 30, {{ last_extracted_date }})
+        where start_time between {{ last_extracted_date }} and dateadd(day, {{ env_var('DBT_EXTRACTION_WINDOW_IN_DAYS') }}, {{ last_extracted_date }})
     ),
 
     stg_fact_01 as (
@@ -103,8 +102,7 @@ with
             end_station_id,
             end_station_latitude,
             end_station_longitude,
-            end_location,
-            start_time_year_month
+            end_location
         from prepare_filter
     ),
 
@@ -156,8 +154,7 @@ with
             end_station_id,
             end_station_latitude,
             end_station_longitude,
-            end_location,
-            start_time_year_month
+            end_location
         from stg_fact_01
     )
 
