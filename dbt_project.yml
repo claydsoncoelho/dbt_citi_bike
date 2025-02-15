@@ -46,11 +46,12 @@ models:
       +materialized: table
       +docs:
         node_color: "#132a13"
-      intermediate:
-        +database: STG_DW
-        +materialized: view
-        +docs:
-          node_color: "#004b23"
+        
+    intermediate:
+      +database: STG_DW
+      +materialized: view
+      +docs:
+        node_color: "#004b23"
 
     staging:
       +database: STG_DATASTORE
@@ -72,9 +73,14 @@ snapshots:
 
 seeds:
   citi_bike:
-    +database: DATASTORE
-    +docs:
-      node_color: "#38b000"
+    dbt_project_evaluator_seeds:
+      +database: DBT_PROJECT_EVALUATOR
+      
+  dbt_project_evaluator:
+    dbt_project_evaluator_exceptions:
+      +enabled: false
+
+
 
 # dbt_project_evaluator macro to test project's development quality
 dispatch:

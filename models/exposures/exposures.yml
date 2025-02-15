@@ -2,7 +2,7 @@ version: 2
 
 exposures:
   - name: exp_citi_bike_dash_power_bi
-    label: Citi Bike Trips
+    label: Citi Bike Dashboard
     type: dashboard
     maturity: high
     url: https://app.powerbi.com/links/fl6JhFanfb?ctid=a51288de-b781-43b3-9666-50b41f408a2b&pbi_source=linkShare
