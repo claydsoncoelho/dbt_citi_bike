@@ -16,7 +16,7 @@ models:
           - not_null
           - unique
       - name: date
-        description: "The actual date value in date format. Example: '2015-01-01'."
+        description: '{{ doc("col_date") }}'
         data_type: date
         
       - name: month
@@ -34,6 +34,14 @@ models:
       - name: quarter
         description: "Quarter of the year. Example: '1'."
         data_type: integer
+
+      - name: is_holiday
+        description: '{{ doc("col_is_holiday") }}'
+        data_type: boolean
+
+      - name: holiday_name
+        description: '{{ doc("col_holiday_name") }}'
+        data_type: string
 
 
   - name: dim_weather
