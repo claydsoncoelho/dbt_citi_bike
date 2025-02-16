@@ -300,3 +300,22 @@ models:
       - name: end_location
         data_type: varchar
         description: '{{ doc("col_end_location") }}'
+
+  - name: int_holidays
+    description: "Internal python model to provide holidays to Dim_Date."
+    columns:
+
+      - name: date
+        data_type: date
+        description: '{{ doc("col_date") }}'
+        tests:
+          - not_null
+          - unique
+
+      - name: is_holiday
+        data_type: boolean
+        description: '{{ doc("col_is_holiday") }}'
+
+      - name: holiday_name
+        data_type: string
+        description: '{{ doc("col_holiday_name") }}'
