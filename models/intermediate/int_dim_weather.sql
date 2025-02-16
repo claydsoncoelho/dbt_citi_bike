@@ -2,6 +2,7 @@
     materialized='ephemeral'
 ) }}
 
+
 with
 
     source as (select * from {{ ref("snap_stg_citi_bike_weather_nyc") }}),
@@ -27,9 +28,11 @@ with
             city_id,
             city_findname,
             dbt_updated_at
+            
         from source
 
     )
+    
 
 select *
 from stg_dim
