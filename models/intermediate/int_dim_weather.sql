@@ -27,6 +27,7 @@ with
             city_id,
             city_findname,
             dbt_updated_at
+            
         from source
 
     )
