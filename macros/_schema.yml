@@ -1,0 +1,44 @@
+version: 2
+
+macros:
+  - name: get_watermark
+    description: Get the max value of a specific field in a table. 
+    arguments:
+      - name: database_name
+        type: string
+        description: The database name.
+
+      - name: table_name
+        type: string
+        description: The table name.
+
+      - name: column_name
+        type: string
+        description: The name of the column where the max() will be performed.
+
+      - name: default_value
+        type: string
+        description: In case the table doesn't exist or is empty, this is the value that will be returned.
+
+  - name: scd_type_2
+    description: Generates Slow Change Dimention type 2 format of the source model.
+    arguments:
+      - name: source_model_name
+        type: string
+        description: The name of the source dbt model containing the source data of the dimension.
+
+      - name: target_table_name
+        type: string
+        description: The name of the target dimension table.
+
+      - name: key_col
+        type: string
+        description: The name of the key column in the source_model_name. This macro doesn't support composite key.
+
+      - name: other_cols
+        type: list
+        description: List of strings containing the column names from source_model_name that will be in the final dimension.
+
+      - name: timestamp_col
+        type: string
+        description: The name of the column from source_model_name that contains the timestamp of when the data was inserted/updated.
