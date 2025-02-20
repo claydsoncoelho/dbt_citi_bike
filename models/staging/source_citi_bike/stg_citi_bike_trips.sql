@@ -11,7 +11,7 @@
 with
     source as (select * from {{ source("source_citi_bike", "trips") }}),
 
-    add_new_columns as (
+    add_and_rename_columns as (
         select
             bikeid AS bike_id,
             starttime AS start_time,
@@ -65,7 +65,7 @@ with
             metadata_file_row_number,
             metadata_file_last_modified,
             start_time_year_month
-        from add_new_columns
+        from add_and_rename_columns
     )
 
 

@@ -5,7 +5,7 @@ sources:
     description: This is the Citi Bike source system.
     database: RAW
     schema: citi_bike
-    freshness: # default freshness
+    freshness:
       warn_after: {count: 12, period: day}
       error_after: {count: 24, period: day}
     loaded_at_field: METADATA_FILE_LAST_MODIFIED
