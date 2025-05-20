@@ -1,0 +1,1 @@
+select * from {{ source('source_citi_bike', 'trips') }}

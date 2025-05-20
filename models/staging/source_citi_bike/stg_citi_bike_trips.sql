@@ -4,7 +4,7 @@
         database_name='stg_dw', 
         table_name='int_fact_trips_02', 
         column_name='start_time', 
-        default_value='2016-07-01 00:00:02.000'
+        default_value='2018-01-01 00:01:50.650'
     ) }}'
 {%- endset -%}
 
