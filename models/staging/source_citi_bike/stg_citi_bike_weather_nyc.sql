@@ -7,6 +7,7 @@ with
 
     source as (select * from {{ source("source_citi_bike", "weather_nyc") }}),
 
+    -- Stablishing lat/long datatypes to NUMBER(9,6) accross entire DW.
     renamed as (
 
         select
@@ -17,8 +18,8 @@ with
             DATA:city:findname::STRING AS city_findname,
             
             -- Coordinates from city
-            DATA:city:coord:lat::FLOAT AS city_latitude,
-            DATA:city:coord:lon::FLOAT AS city_longitude,
+            DATA:city:coord:lat::NUMBER(9,6) AS city_latitude,
+            DATA:city:coord:lon::NUMBER(9,6) AS city_longitude,
             
             -- Weather details
             DATA:weather[0]:description::STRING AS weather_description,

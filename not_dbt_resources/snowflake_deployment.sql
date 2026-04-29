@@ -2,7 +2,44 @@ USE ROLE ACCOUNTADMIN;
 ALTER ACCOUNT SET TIMEZONE = 'Pacific/Auckland';
 
 --------------------------------------------------------------------------
---Roles
+-- Storage Integrations
+--------------------------------------------------------------------------
+USE ROLE ACCOUNTADMIN;
+CREATE STORAGE INTEGRATION citi_bike_storage_integration
+  TYPE = EXTERNAL_STAGE
+  STORAGE_PROVIDER = 'AZURE'
+  ENABLED = TRUE
+  AZURE_TENANT_ID = 'a51288de-b781-43b3-9666-50b41f408a2b'
+  STORAGE_ALLOWED_LOCATIONS = ('azure://citibike4clay.blob.core.windows.net/citi-bike/');
+
+--------------------------------------------------------------------------
+-- IMPORTANT!!!
+-- Perform the following steps manually
+--------------------------------------------------------------------------
+
+DESC STORAGE INTEGRATION citi_bike_storage_integration;
+
+-- 1. Two important information here:
+-- AZURE_CONSENT_URL
+-- AZURE_MULTI_TENANT_APP_NAME
+
+-- 2. Navigate to the AZURE_CONSENT_URL in a browser and click Accept to create the Snowflake service principal in your tenant.
+
+-- 3. In the Azure portal, navigate to your Storage Account > Access Control (IAM) > Add role assignment.
+-- Assign "Storage Blob Data Reader" for read-only access (loading data)
+-- Search for the first characters in AZURE_MULTI_TENANT_APP_NAME noted earlier to find the correct service principal.
+
+--------------------------------------------------------------------------
+-- End of manual process. 
+--------------------------------------------------------------------------
+
+--------------------------------------------------------------------------
+-- Roles
+-- ROLE_INGESTION	Used for ingestion tools to ingest data into Snowflake Raw database only.
+-- DEV_ROLE_TRANSFORMATION	Used by dbt for data transformation across Snowflake DEV databases.
+-- TEST_ROLE_TRANSFORMATION	Used by dbt for data transformation across Snowflake TEST databases.
+-- PROD_ROLE_TRANSFORMATION	Used by dbt for data transformation across Snowflake PROD databases.
+-- PROD_ROLE_REPORT	Used by Power BI for querying Snowflake PROD DW database only.
 --------------------------------------------------------------------------
 USE ROLE SECURITYADMIN;
 CREATE OR REPLACE ROLE ROLE_INGESTION;
@@ -42,10 +79,19 @@ GRANT ROLE PROD_ROLE_REPORT TO ROLE SYSADMIN;
 GRANT USAGE ON WAREHOUSE COMPUTE_WH TO ROLE PROD_ROLE_REPORT;
 
 --------------------------------------------------------------------------
---Databases
+-- Databases
+-- RAW.CITI_BIKE
+-- STG_DATASTORE.TEST
+-- STG_DATASTORE.PROD
+-- DATASTORE.TEST
+-- DATASTORE.PROD
+-- STG_DW.TEST
+-- STG_DW.PROD
+-- DW.TEST
+-- DW.PROD
+-- DBT_PROJECT_EVALUATOR.TEST
+-- DBT_PROJECT_EVALUATOR.PROD
 --------------------------------------------------------------------------
-
-
 USE ROLE ROLE_INGESTION;
 CREATE OR REPLACE DATABASE RAW;
 CREATE OR REPLACE SCHEMA CITI_BIKE;
@@ -129,7 +175,7 @@ GRANT SELECT ON FUTURE TABLES IN SCHEMA DW.PROD TO ROLE PROD_ROLE_REPORT;
 
 
 --------------------------------------------------------------------------
---dbt-specifc user
+-- dbt-specifc user
 --------------------------------------------------------------------------
 
 USE ROLE SYSADMIN;
@@ -146,16 +192,14 @@ GRANT ALL ON SCHEMA DW.DBT_CCOELHO TO ROLE DEV_ROLE_TRANSFORMATION;
 GRANT ALL ON SCHEMA DBT_PROJECT_EVALUATOR.DBT_CCOELHO TO ROLE DEV_ROLE_TRANSFORMATION;
 
 
-
 --------------------------------------------------------------------------
---Stages and File Formats
+-- Stages and File Formats
 --------------------------------------------------------------------------
 
 USE ROLE ROLE_INGESTION;
 CREATE OR REPLACE STAGE RAW.CITI_BIKE.AZURE_CITI_BIKE
-URL = 'azure://CHANGE-ME.blob.core.windows.net/citi-bike/data/'
-CREDENTIALS = (
-    AZURE_SAS_TOKEN = 'sp=CHANGE-ME-nPI9js8%3D');
+STORAGE_INTEGRATION = citi_bike_storage_integration
+URL = 'azure://citibike4clay.blob.core.windows.net/citi-bike/';
 
 CREATE OR REPLACE STAGE RAW.CITI_BIKE.S3_NYC_WEATHER
 url = 's3://snowflake-workshop-lab/weather-nyc';
@@ -163,37 +207,24 @@ url = 's3://snowflake-workshop-lab/weather-nyc';
 CREATE OR REPLACE FILE FORMAT RAW.CITI_BIKE.FF_CSV_01
     TYPE = CSV
     FIELD_DELIMITER = ','
-    SKIP_HEADER = 1
     NULL_IF = ('NULL', 'null')
     EMPTY_FIELD_AS_NULL = true
     FIELD_OPTIONALLY_ENCLOSED_BY = '"'
-    TRIM_SPACE = TRUE;
+    TRIM_SPACE = TRUE
+    PARSE_HEADER = TRUE -- Important for match_by_column_name.
+    ERROR_ON_COLUMN_COUNT_MISMATCH = FALSE; -- This is important for INCLUDE_METADATA.
 
 CREATE OR REPLACE FILE FORMAT RAW.CITI_BIKE.FF_JSON_01
     TYPE = 'JSON';
 
-
 --------------------------------------------------------------------------
---Create Tables
+-- Create RAW Tables
 --------------------------------------------------------------------------
-    
 
-CREATE OR REPLACE TABLE RAW.CITI_BIKE.TRIPS (
-	TRIPDURATION NUMBER(38,0),
-	STARTTIME TIMESTAMP_NTZ(9),
-	STOPTIME TIMESTAMP_NTZ(9),
-	START_STATION_ID NUMBER(38,0),
-    START_STATION_NAME STRING,
-    START_STATION_LATITUDE FLOAT,
-    START_STATION_LONGITUDE FLOAT,
-	END_STATION_ID NUMBER(38,0),
-    END_STATION_NAME STRING,
-    END_STATION_LATITUDE FLOAT,
-    END_STATION_LONGITUDE FLOAT,
-	BIKEID NUMBER(38,0),
-	USERTYPE STRING,
-	BIRTH_YEAR NUMBER(38,0),
-	GENDER NUMBER(38,0), 
+-- This table has ENABLE_SCHEMA_EVOLUTION. 
+-- The column names will be added automatically based on the source files.
+CREATE OR REPLACE TABLE RAW.CITI_BIKE.TRIPS 
+ENABLE_SCHEMA_EVOLUTION = TRUE (
     METADATA_FILENAME STRING, 
     METADATA_FILE_ROW_NUMBER INT, 
     METADATA_FILE_LAST_MODIFIED TIMESTAMP
@@ -211,24 +242,24 @@ CREATE OR REPLACE TABLE RAW.CITI_BIKE.WEATHER_NYC (
 --Ingest data
 --------------------------------------------------------------------------
 
-USE ROLE ROLE_INGESTION;
-COPY INTO RAW.CITI_BIKE.TRIPS from (
-    SELECT 
-        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15
-        ,METADATA$FILENAME, METADATA$FILE_ROW_NUMBER, METADATA$FILE_LAST_MODIFIED
-    FROM @RAW.CITI_BIKE.AZURE_CITI_BIKE
-    (FILE_FORMAT => 'RAW.CITI_BIKE.FF_CSV_01', PATTERN => '.*trips*.*csv.*')
+COPY INTO RAW.CITI_BIKE.TRIPS 
+FROM @RAW.CITI_BIKE.AZURE_CITI_BIKE
+FILE_FORMAT = (FORMAT_NAME = 'RAW.CITI_BIKE.FF_CSV_01')
+PATTERN = '.*citibike-tripdata_.*[.]csv'
+MATCH_BY_COLUMN_NAME = CASE_INSENSITIVE
+INCLUDE_METADATA = (
+    METADATA_FILENAME = METADATA$FILENAME,
+    METADATA_FILE_ROW_NUMBER = METADATA$FILE_ROW_NUMBER,
+    METADATA_FILE_LAST_MODIFIED = METADATA$FILE_LAST_MODIFIED
 );
-
 
 COPY INTO RAW.CITI_BIKE.WEATHER_NYC from (
     SELECT 
         $1
         ,METADATA$FILENAME, METADATA$FILE_ROW_NUMBER, METADATA$FILE_LAST_MODIFIED
     FROM @RAW.CITI_BIKE.S3_NYC_WEATHER
-    (FILE_FORMAT => 'RAW.CITI_BIKE.FF_JSON_01', PATTERN => '.*weather*.*json.*')
+    (FILE_FORMAT => 'RAW.CITI_BIKE.FF_JSON_01', PATTERN => '.*weather_.*[.]json[.]gz')
 );
-
 
 --------------------------------------------------------------------------
 --END

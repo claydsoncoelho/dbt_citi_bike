@@ -1,9 +1,10 @@
 snapshots:
   - name: snap_stg_citi_bike_weather_nyc
     relation: ref('stg_citi_bike_weather_nyc')
-    docs:
-      show: true
+    
     config:
+      docs:
+        show: true
       alias: "citi_bike_weather_nyc"
       unique_key: time_readable
       strategy: timestamp

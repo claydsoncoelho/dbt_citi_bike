@@ -1,3 +1,5 @@
+-- models/intermediate/int_fact_trips_01.sql
+
 {{ config(
     materialized='table'
 ) }}
@@ -8,9 +10,25 @@
         database_name='stg_dw', 
         table_name='int_fact_trips_02', 
         column_name='start_time', 
-        default_value='2016-07-01 00:00:02.000'
+        default_value=var("citi_bike_start_date")
     ) }}'
 {%- endset -%}
+
+-- Ranges:
+-- start_time_min/max: Time 31 min. The weather table has records with interval of around 1 hours.
+-- lat/long min/max: 1 degree of latitude corresponds to roughly 111 kilometers.
+-- 0.05 degrees is approximately 5.5 kilometers.
+-- 0.15 degrees is approximately 16 kilometers.
+{%- set time_window -%}
+    31
+{%- endset -%}
+{%- set lat_long_window_tight -%}
+    0.05
+{%- endset %}
+{%- set lat_long_window_loose -%}
+    0.15
+{%- endset %}
+
 
 with
 
@@ -20,6 +38,7 @@ with
         select 
             bike_id,
             start_time,
+            cast(start_time as date) as start_date,
             user_type,
             birth_year,
             stop_time,
@@ -29,6 +48,12 @@ with
             start_station_id,
             start_station_latitude,
             start_station_longitude,
+            -- Since we have only 2 wather stations in NYC with distinct inter lat/lon:
+            -- 40.714272	-74.005966
+            -- 43.000351	-75.499901
+            -- We are rounding the lat/lon bucket to an integer
+            round(start_station_latitude) as start_lat_bucket,
+            round(start_station_longitude) as start_lon_bucket,
             start_location,
             end_station_id,
             end_station_latitude,
@@ -45,9 +70,8 @@ with
 
     stg_fact_01 as (
         select
-            -- Time tolerance 120 min. The weather table has records with interval of around 2 hours.
-            dateadd(minute, -120, start_time) as start_time_min,
-            dateadd(minute, 120, start_time) as start_time_max,
+            dateadd(minute, -{{ time_window }}, start_time) as start_time_min,
+            dateadd(minute, {{ time_window }}, start_time) as start_time_max,
 
             -- Trip duration
             time(
@@ -82,13 +106,17 @@ with
             date(start_time) as trip_start_date,
             trip_duration as trip_duration_seconds,
 
-            -- 1 degree of latitude corresponds to roughly 111 kilometers.
-            -- 0.11 degrees is approximately 12.21 kilometers.
-            start_station_latitude - 0.11 as start_station_latitude_min,
-            start_station_latitude + 0.11 as start_station_latitude_max,
-            start_station_longitude - 0.11 as start_station_longitude_min,
-            start_station_longitude + 0.11 as start_station_longitude_max,
+            start_station_latitude - {{ lat_long_window_tight }} as start_station_latitude_min,
+            start_station_latitude + {{ lat_long_window_tight }} as start_station_latitude_max,
+            start_station_longitude - {{ lat_long_window_tight }} as start_station_longitude_min,
+            start_station_longitude + {{ lat_long_window_tight }} as start_station_longitude_max,
 
+            start_station_latitude - {{ lat_long_window_loose }} as start_station_latitude_min_loose,
+            start_station_latitude + {{ lat_long_window_loose }} as start_station_latitude_max_loose,
+            start_station_longitude - {{ lat_long_window_loose }} as start_station_longitude_min_loose,
+            start_station_longitude + {{ lat_long_window_loose }} as start_station_longitude_max_loose,
+
+            start_date,
             user_type,
             start_time,
             stop_time,
@@ -98,6 +126,8 @@ with
             start_station_id,
             start_station_latitude,
             start_station_longitude,
+            start_lat_bucket,
+            start_lon_bucket,
             start_location,
             end_station_id,
             end_station_latitude,
@@ -108,12 +138,17 @@ with
 
     stg_fact_02 as (
         select
+            start_date,
             start_time_min,
             start_time_max,
             start_station_latitude_min,
             start_station_latitude_max,
             start_station_longitude_min,
             start_station_longitude_max,
+            start_station_latitude_min_loose,
+            start_station_latitude_max_loose,
+            start_station_longitude_min_loose,
+            start_station_longitude_max_loose,
             bike_id,
             start_time,
             trip_start_date,
@@ -150,6 +185,8 @@ with
             start_station_id,
             start_station_latitude,
             start_station_longitude,
+            start_lat_bucket,
+            start_lon_bucket,
             start_location,
             end_station_id,
             end_station_latitude,

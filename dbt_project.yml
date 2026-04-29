@@ -3,12 +3,13 @@
 # and underscores. A good package name should reflect your organization's
 # name or the intended use of these models
 name: 'citi_bike'
-version: '1.0.0'
+version: '1.10'
 config-version: 2
 
 vars:
   min_date: "1900-01-01 00:00:00"
   max_date: "9999-12-31 00:00:00"
+  citi_bike_start_date: "2019-01-01 00:01:47.401"
 
 # This setting configures which "profile" dbt uses for this project.
 profile: 'default'
@@ -41,23 +42,28 @@ clean-targets:         # directories to be removed by `dbt clean`
 
 models:
   citi_bike:
-    marts:
-      +database: DW
-      +materialized: table
+
+    staging:
+      +tags: "staging"
+      +database: STG_DATASTORE
+      +materialized: view
       +docs:
-        node_color: "#132a13"
+        node_color: "#008000"
         
     intermediate:
+      +tags: "intermediate"
       +database: STG_DW
       +materialized: view
       +docs:
         node_color: "#004b23"
 
-    staging:
-      +database: STG_DATASTORE
-      +materialized: view
+    marts:
+      +tags: "marts"
+      +database: DW
+      +materialized: table
       +docs:
-        node_color: "#008000"
+        node_color: "#132a13"
+    
 
   dbt_project_evaluator:
     +database: DBT_PROJECT_EVALUATOR

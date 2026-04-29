@@ -5,10 +5,20 @@ sources:
     description: This is the Citi Bike source system.
     database: RAW
     schema: citi_bike
-    freshness: # default freshness
-      warn_after: {count: 12, period: day}
-      error_after: {count: 24, period: day}
-    loaded_at_field: METADATA_FILE_LAST_MODIFIED
+
+    # dbt can calculate freshness without a loaded_at_field by using Snowflake's account-level metadata (the LAST_ALTERED timestamp in INFORMATION_SCHEMA).
+    # select
+    #   max(LAST_ALTERED) as max_loaded_at,
+    #   convert_timezone('UTC', current_timestamp()) as snapshotted_at
+    # from "RAW"."INFORMATION_SCHEMA"."TABLES"
+    # where upper(table_schema) = upper('CITI_BIKE')
+    #   and upper(table_name) = upper('TRIPS');
+    config:
+      freshness: 
+        warn_after: {count: 12, period: day}
+        error_after: {count: 24, period: day}
+      # loaded_at_field: METADATA_FILE_LAST_MODIFIED
+
     tables:
       - name: trips
         description: This table contains csv data from source trips.
