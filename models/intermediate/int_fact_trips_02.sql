@@ -9,10 +9,12 @@ with
     dim_weather as (select * from {{ ref("dim_weather") }}),
     dim_date as (select * from {{ ref("dim_date") }}),
 
+    -- This cte uses interger part of lat/lon and time of the day to try to find the precise weather.
     find_weather_first_try as (
 
         select
             source.bike_id,
+            source.start_date,
             source.start_time,
             dim_weather_start_location.time_readable,
             dim_date.dim_date_id as dim_date_id_trip,
@@ -37,10 +39,16 @@ with
             source.end_station_latitude,
             source.end_station_longitude,
             source.end_location,
+            source.start_lat_bucket,
+            source.start_lon_bucket,
             source.start_station_latitude_min,
             source.start_station_latitude_max, 
             source.start_station_longitude_min,
             source.start_station_longitude_max,
+            source.start_station_latitude_min_loose,
+            source.start_station_latitude_max_loose, 
+            source.start_station_longitude_min_loose,
+            source.start_station_longitude_max_loose,
             source.start_time_min,
             source.start_time_max
 
@@ -48,12 +56,15 @@ with
 
         left join dim_date on source.trip_start_date = dim_date.date
 
-        -- Join with dim_weather using lat/long and time (this is the most precise join)
         left join dim_weather dim_weather_start_location
-            on dim_weather_start_location.city_latitude between start_station_latitude_min and start_station_latitude_max
-            and dim_weather_start_location.city_longitude between start_station_longitude_min and start_station_longitude_max
+            on dim_weather_start_location.city_lat_bucket = source.start_lat_bucket  -- EQUALITY to improve performance
+            and dim_weather_start_location.city_lon_bucket = source.start_lon_bucket -- EQUALITY to improve performance
+            and dim_weather_start_location.date_readable = source.start_date -- EQUALITY to improve performance
             and dim_weather_start_location.time_readable between start_time_min and start_time_max
-            and source.start_time between dim_weather_start_location.scd_valid_from and dim_weather_start_location.scd_valid_to
+            
+            -- and source.start_time between dim_weather_start_location.scd_valid_from and dim_weather_start_location.scd_valid_to
+            -- and dim_weather_start_location.city_latitude between start_station_latitude_min and start_station_latitude_max
+            -- and dim_weather_start_location.city_longitude between start_station_longitude_min and start_station_longitude_max
     ),
 
     weather_not_found as (
@@ -62,11 +73,14 @@ with
 
     ),
 
+    -- This cte uses interger part of lat/lon and date to try to find the weather
     find_weather_second_try as (
 
         select
             weather_not_found.bike_id,
+            weather_not_found.start_date,
             weather_not_found.start_time,
+            dim_weather_start_location.date_readable,
             dim_weather_start_location.time_readable,
             weather_not_found.dim_date_id_trip,
             dim_weather_start_location.scd_dim_weather_id,
@@ -90,10 +104,16 @@ with
             weather_not_found.end_station_latitude,
             weather_not_found.end_station_longitude,
             weather_not_found.end_location,
+            weather_not_found.start_lat_bucket,
+            weather_not_found.start_lon_bucket,
             weather_not_found.start_station_latitude_min,
             weather_not_found.start_station_latitude_max, 
             weather_not_found.start_station_longitude_min,
             weather_not_found.start_station_longitude_max,
+            weather_not_found.start_station_latitude_min_loose,
+            weather_not_found.start_station_latitude_max_loose, 
+            weather_not_found.start_station_longitude_min_loose,
+            weather_not_found.start_station_longitude_max_loose,
             weather_not_found.start_time_min,
             weather_not_found.start_time_max
             
@@ -101,10 +121,14 @@ with
 
         -- Join with dim_weather using lat/long and date (loose join to try to fill gaps in Dim_Weather).
         left join dim_weather dim_weather_start_location
-            on dim_weather_start_location.city_latitude between start_station_latitude_min and start_station_latitude_max
-            and dim_weather_start_location.city_longitude between start_station_longitude_min and start_station_longitude_max
-            and cast(dim_weather_start_location.time_readable as date) = cast(start_time as date)
-            and weather_not_found.start_time between dim_weather_start_location.scd_valid_from and dim_weather_start_location.scd_valid_to
+            on dim_weather_start_location.city_lat_bucket = weather_not_found.start_lat_bucket  -- EQUALITY to improve performance
+            and dim_weather_start_location.city_lon_bucket = weather_not_found.start_lon_bucket -- EQUALITY to improve performance
+            and dim_weather_start_location.date_readable = weather_not_found.start_date -- EQUALITY to improve performance
+
+            -- on dim_weather_start_location.city_latitude between weather_not_found.start_station_latitude_min and weather_not_found.start_station_latitude_max
+            -- and dim_weather_start_location.city_longitude between weather_not_found.start_station_longitude_min and weather_not_found.start_station_longitude_max
+            -- and dim_weather_start_location.date_readable = weather_not_found.start_date
+            -- and weather_not_found.start_time between dim_weather_start_location.scd_valid_from and dim_weather_start_location.scd_valid_to
 
     ),
 
@@ -131,6 +155,16 @@ with
             start_station_id,
             start_station_latitude,
             start_station_longitude,
+            start_lat_bucket,
+            start_lon_bucket,
+            start_station_latitude_min,
+            start_station_latitude_max,
+            start_station_longitude_min,
+            start_station_longitude_max,
+            start_station_latitude_min_loose,
+            start_station_latitude_max_loose,
+            start_station_longitude_min_loose,
+            start_station_longitude_max_loose,
             start_location,
             end_station_id,
             end_station_latitude,
@@ -138,7 +172,7 @@ with
             end_location
         from find_weather_first_try where scd_dim_weather_id is not null
         
-        union
+        union all
 
         select
             bike_id,
@@ -161,6 +195,16 @@ with
             start_station_id,
             start_station_latitude,
             start_station_longitude,
+            start_lat_bucket,
+            start_lon_bucket,
+            start_station_latitude_min,
+            start_station_latitude_max,
+            start_station_longitude_min,
+            start_station_longitude_max,
+            start_station_latitude_min_loose,
+            start_station_latitude_max_loose,
+            start_station_longitude_min_loose,
+            start_station_longitude_max_loose,
             start_location,
             end_station_id,
             end_station_latitude,
@@ -197,6 +241,16 @@ with
             start_station_id,
             start_station_latitude,
             start_station_longitude,
+            start_lat_bucket,
+            start_lon_bucket,
+            start_station_latitude_min,
+            start_station_latitude_max,
+            start_station_longitude_min,
+            start_station_longitude_max,
+            start_station_latitude_min_loose,
+            start_station_latitude_max_loose,
+            start_station_longitude_min_loose,
+            start_station_longitude_max_loose,
             start_location,
             end_station_id,
             end_station_latitude,

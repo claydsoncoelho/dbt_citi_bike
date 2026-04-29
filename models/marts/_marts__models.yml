@@ -1,11 +1,13 @@
+# models/marts/_marts__models.yml
 version: 2
 
 models:
 
   - name: dim_date
     description: "Dimension table containing detailed date attributes for time-based analysis."
-    access: public
+    
     config:
+      access: public
       contract:
         enforced: true
     columns:
@@ -38,8 +40,9 @@ models:
 
   - name: dim_weather
     description: 'This table extracts weather data for New York City and includes various weather metrics and geolocation information.'
-    access: public
+    
     config:
+      access: public
       contract:
         enforced: true
     columns:
@@ -50,6 +53,10 @@ models:
         tests:
           - not_null
           - unique
+
+      - name: date_readable
+        description: '{{ doc("col_date_readable") }}'
+        data_type: date
 
       - name: time_readable
         description: '{{ doc("col_time_readable") }}'
@@ -81,15 +88,23 @@ models:
 
       - name: wind_speed
         description: '{{ doc("col_wind_speed") }}'
-        data_type: float # Or float if appropriate
+        data_type: float 
 
       - name: city_latitude
         description: '{{ doc("col_city_latitude") }}'
-        data_type: float # Or float if appropriate
+        data_type: NUMBER(9,6) 
+
+      - name: city_lat_bucket
+        description: '{{ doc("col_city_lat_bucket") }}'
+        data_type: NUMBER
 
       - name: city_longitude
         description: '{{ doc("col_city_longitude") }}'
-        data_type: float # Or float if appropriate
+        data_type: NUMBER(9,6) 
+
+      - name: city_lon_bucket
+        description: '{{ doc("col_city_lon_bucket") }}'
+        data_type: NUMBER
 
       - name: city_location
         description: '{{ doc("col_city_location") }}'
@@ -130,19 +145,21 @@ models:
 
   - name: fct_trips
     description: "Fact table containing trip-related data, including trip counts, durations, distances, weather and demographics of the users."
-    access: public
-    tests:
+    
+    data_tests:
     - dbt_utils.unique_combination_of_columns:
-        combination_of_columns:
-          - dim_date_id_trip
-          - scd_dim_weather_id
-          - trip_duration_min_range
-          - period_of_day
-          - trip_distance_range
-          - user_type
-          - age_range
-          - gender
+        arguments: 
+          combination_of_columns:
+            - dim_date_id_trip
+            - scd_dim_weather_id
+            - trip_duration_min_range
+            - period_of_day
+            - trip_distance_range
+            - user_type
+            - age_range
+            - gender
     config:
+      access: public
       alias: fact_trips
       contract:
         enforced: true

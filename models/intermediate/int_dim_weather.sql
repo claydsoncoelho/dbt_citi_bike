@@ -10,6 +10,7 @@ with
 
         select
             time_readable,
+            cast(time_readable as date) as date_readable,
             country,
             city_name,
             weather_main,
@@ -17,8 +18,10 @@ with
             temperature - 273.15 as temperature_celsius,
             humidity,
             wind_speed,
-            city_latitude,
-            city_longitude,
+            cast(city_latitude as NUMBER(9,6)) as city_latitude,
+            cast(city_longitude as NUMBER(9,6)) as city_longitude,
+            round(cast(city_latitude as NUMBER(9,6))) as city_lat_bucket,
+            round(cast(city_longitude as NUMBER(9,6))) as city_lon_bucket,
             city_location,
             ST_GeographyFromText(city_location) as city_location_geography,
             temperature as temperature_kelvin,

@@ -1,9 +1,12 @@
+# snapshots/snap_stg_citi_bike_trips.yml
+
 snapshots:
   - name: snap_stg_citi_bike_trips
     relation: ref('stg_citi_bike_trips')
-    docs:
-      show: true
+    
     config:
+      docs:
+        show: true
       alias: "citi_bike_trips"
       unique_key:
         - bike_id

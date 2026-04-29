@@ -97,3 +97,15 @@ Foreign key referencing the Dim_Date` dimension table, representing the date on 
 {% docs col_trip_count %}
 The number of trips recorded.
 {% enddocs %}
+
+{% docs col_date_readable %}
+Human-readable format of the date the data was recorded
+{% enddocs %}
+
+{% docs col_city_lat_bucket %}
+Latitude of the city in a rounded format to improve joing performance
+{% enddocs %}
+
+{% docs col_city_lon_bucket %}
+Longitude of the city in a rounded format to improve joing performance
+{% enddocs %}

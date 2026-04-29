@@ -1,7 +1,7 @@
 
 {{ config(
     cluster_by=[
-        'time_readable',
+        'date_readable',
         'city_latitude',
         'city_longitude'
     ]
@@ -12,6 +12,7 @@
     target_table_name = 'dim_weather',
     key_col = 'time_readable',
     other_cols = [
+        'date_readable',
         'country',
         'city_name',
         'weather_main',
@@ -21,6 +22,8 @@
         'wind_speed',
         'city_latitude',
         'city_longitude',
+        'city_lat_bucket',
+        'city_lon_bucket',
         'city_location',
         'temperature_kelvin',
         'pressure',
