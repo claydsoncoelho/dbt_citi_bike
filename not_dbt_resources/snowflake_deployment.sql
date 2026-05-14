@@ -264,3 +264,36 @@ COPY INTO RAW.CITI_BIKE.WEATHER_NYC from (
 --------------------------------------------------------------------------
 --END
 --------------------------------------------------------------------------
+
+-- "Snowflake is enforcing strong authentication for all users starting August 31, 2026. 
+-- Password authentication is no longer supported for connecting to Snowflake. 
+-- Update your credentials to use key-pair for deployment or Auth for development environments."
+
+-- IMPORTANT: dbt Enterprise and Enterprise+ supports OAuth authentication with Snowflake.
+
+-- USE ROLE ACCOUNTADMIN;
+-- CREATE OR REPLACE SECURITY INTEGRATION DBT_CLOUD_OAUTH
+--   TYPE = OAUTH
+--   ENABLED = TRUE
+--   OAUTH_CLIENT = CUSTOM
+--   OAUTH_CLIENT_TYPE = 'CONFIDENTIAL'
+--   OAUTH_REDIRECT_URI = 'https://cloud.getdbt.com/next/auth/snowflake/callback'
+--   OAUTH_ALLOW_NON_TLS_REDIRECT_URI = FALSE;
+
+-- SELECT SYSTEM$SHOW_OAUTH_CLIENT_SECRETS('DBT_CLOUD_OAUTH');
+
+-- Key pair authentication:
+-- https://github.com/sleekdata/misc-projects/blob/main/snowflake_dbt_key_pair_setup.md
+-- In your local terminal matchine:
+-- openssl genrsa 2048 | openssl pkcs8 -topk8 -v2 des3 -out rsa_private_key.p8
+-- openssl rsa -in rsa_private_key.p8 -pubout -out rsa_public_key.pub
+-- cat rsa_public_key.pub
+-- cat rsa_private_key.p8
+-- then:
+
+ALTER USER clay01 SET RSA_PUBLIC_KEY='-----BEGIN PUBLIC KEY-----
+MIIBIjchange me
+-----END PUBLIC KEY-----';
+
+-- **Upload the Private Key to dbt:**
+-- Go to that **Credentials** page you were looking at, select **Key pair**, and upload the `dbt_key.pem` file.
